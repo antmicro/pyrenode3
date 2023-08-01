@@ -1,0 +1,123 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyrenode3"
+description = "Python interface for Renode (https://renode.io)"
+
+readme = "README.md"
+license = "Apache-2.0"
+
+requires-python = ">=3.8"
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+]
+
+dynamic = ["version"]
+
+dependencies = [
+    "pythonnet>=3.0.1",
+    "requests>=2.31.0"
+]
+
+[project.optional-dependencies]
+interact = ["bpython>=0.24"]
+all = ["pyrenode3[interact]"]
+
+[tool.hatch.envs.default]
+dependencies = [
+    "pyrenode3[all]",
+]
+
+[tool.hatch.envs.default.scripts]
+interact = "python -m pyrenode3"
+
+[tool.hatch.version]
+path = "src/pyrenode3/__about__.py"
+
+[tool.hatch.envs.lint]
+detached = true
+dependencies = [
+    "black>=23.1.0",
+    "ruff>=0.0.243",
+]
+
+[tool.hatch.envs.lint.scripts]
+check = [
+    "ruff {args:.}",
+    "black --check --diff {args:.}",
+]
+fmt = [
+    "black {args:.}",
+    "ruff --fix {args:.}",
+    "check",
+]
+
+[tool.black]
+target-version = ["py38"]
+line-length = 120
+skip-string-normalization = true
+
+[tool.ruff]
+target-version = "py38"
+line-length = 120
+select = [
+    "A",
+    "ARG",
+    "B",
+    "C",
+    "DTZ",
+    "E",
+    "EM",
+    "F",
+    "FBT",
+    "I",
+    "ICN",
+    "ISC",
+    "N",
+    "PLC",
+    "PLE",
+    "PLR",
+    "PLW",
+    "Q",
+    "RUF",
+    "S",
+    "T",
+    "TID",
+    "UP",
+    "W",
+    "YTT",
+]
+ignore = [
+    # Allow non-abstract empty methods in abstract base classes
+    "B027",
+    # Allow boolean positional values in function calls, like `dict.get(... True)`
+    "FBT003",
+    # Ignore checks for possible passwords
+    "S105", "S106", "S107",
+    # Ignore complexity
+    "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+]
+unfixable = [
+    # Don't touch unused imports
+    "F401",
+]
+
+extend-exclude = [
+    "examples/*.py"
+]
+
+[tool.ruff.isort]
+known-first-party = ["pyrenode3"]
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"

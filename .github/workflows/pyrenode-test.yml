@@ -1,0 +1,29 @@
+name: pyrenode3
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    env:
+      PYRENODE_ARCH_PKG: "renode.pkg.tar.xz"
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+
+      - name: Prepare dependencies
+        run: |
+          sudo apt -qqy update 2> /dev/null > /dev/null
+          sudo apt -y purge mono-complete mono-runtime mono-devel 2> /dev/null > /dev/null
+          sudo apt -y autoremove 2> /dev/null > /dev/null
+          sudo apt -qqy install git automake autoconf libtool g++ coreutils policykit-1 uml-utilities python3 mono-complete=6.8.0.105+dfsg-2 python3 python3-pip wget
+
+      - name: Prepare pyrenode
+        run: |
+          mono --version
+          wget -O $PYRENODE_ARCH_PKG --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
+          python3 -m pip install .
+
+      - name: Run examples
+        run: |
+          for i in examples/*; do echo "Running test $i..."; python3 $i; done

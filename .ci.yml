@@ -1,0 +1,13 @@
+build:
+  image: "d2s://external/docker/debian:bookworm"
+  stage: build
+  tags: ['ace-x86_64']
+  before_script:
+    - apt -qqy update 2> /dev/null > /dev/null
+    - apt -qqy install git automake autoconf libtool g++ coreutils policykit-1 uml-utilities python3 mono-complete python3 python3-pip wget
+  script:
+    - wget --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
+    - export PYRENODE_ARCH_PKG=`pwd`/renode-latest.pkg.tar.xz
+    - python3 -m pip install --break-system-packages .
+    - for i in examples/*; do echo "Running test $i..."; python3 $i; done
+

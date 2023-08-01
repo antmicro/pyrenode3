@@ -1,0 +1,12 @@
+__pycache__
+*.pyc
+tags
+*.swp
+venv
+mono_crash*
+renode-*.pkg.tar.xz
+.pytest_cache
+.ruff_cache
+dist
+testdeps
+*.egg-info
