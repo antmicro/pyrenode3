@@ -1,11 +1,17 @@
 import logging
 
-from pyrenode3.wrappers import Emulation
+import pyrenode3
 
 if __name__ == "__main__":
     local = {
-        "Emulation": Emulation,
+        "e": pyrenode3.wrappers.Emulation(),
+        "m": pyrenode3.wrappers.Monitor(),
+        "RPath": pyrenode3.RPath,
+        "interface_to_class": pyrenode3.interface_to_class,
     }
+
+    for wrapper_name in pyrenode3.wrappers.__all__:
+        local[wrapper_name] = getattr(pyrenode3.wrappers, wrapper_name)
 
     try:
         import bpython

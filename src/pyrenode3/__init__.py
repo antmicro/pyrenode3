@@ -25,4 +25,5 @@ if "PYRENODE_SKIP_LOAD" not in os.environ:
 __all__ = [
     "RPath",
     "interface_to_class",
+    "wrappers",
 ]
