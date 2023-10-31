@@ -13,43 +13,45 @@ class RPath:
     """A class used for fetching files and converting paths."""
 
     def __init__(self, location: "Union[str, Path]"):
-        self.__location = location
+        self.__result = self.__fetch(location)
 
     @property
     def path(self) -> str:
-        return str(self.__fetch())
+        return str(self.__result)
 
     @property
     def read_file_path(self) -> "ReadFilePath":
-        return ReadFilePath(str(self.__fetch()))
+        return ReadFilePath(str(self.__result))
 
     @classmethod
     def in_root(cls):
         return RenodeLoader().in_root()
 
-    def __fetch(self):
-        if isinstance(self.__location, Path):
-            return self.__fetch_local()
-
-        scheme = urlparse(self.__location).scheme
-        if scheme in ["http", "https"]:
-            return self.__fetch_http()
-
-        return self.__fetch_local()
-
-    def __fetch_http(self):
+    @classmethod
+    def __fetch_http(cls, uri: str):
         fetcher = wrappers.Emulation().FileFetcher
-        res, filename = fetcher.TryFetchFromUri(Uri(self.__location))
+        res, filename = fetcher.TryFetchFromUri(Uri(uri))
         if not res:
-            msg = f"Downloading from '{self.__location}' failed."
-            raise ValueError(msg)
+            msg = f"Downloading from '{uri}' failed."
+            raise FileNotFoundError(msg)
 
         return Path(filename)
 
-    def __fetch_local(self):
-        res = Path(self.__location)
+    @classmethod
+    def __fetch_local(cls, path: "Union[str, Path]"):
+        res = Path(path)
         if not res.exists():
-            msg = f"'{self.__location}' doesn't exist."
-            raise ValueError(msg)
+            msg = f"'{path}' doesn't exist."
+            raise FileNotFoundError(msg)
 
         return res
+
+    def __fetch(self, location: "Union[str, Path]") -> "Path":
+        if isinstance(location, Path):
+            return self.__fetch_local(location)
+
+        scheme = urlparse(location).scheme
+        if scheme in ["http", "https"]:
+            return self.__fetch_http(location)
+
+        return self.__fetch_local(location)
