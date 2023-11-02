@@ -26,20 +26,19 @@ dynamic = ["version"]
 
 dependencies = [
     "pythonnet>=3.0.1",
-    "requests>=2.31.0"
 ]
 
 [project.optional-dependencies]
 interact = ["bpython>=0.24"]
 all = ["pyrenode3[interact]"]
 
+[project.scripts]
+pyrenode3 = "pyrenode3.cli:main"
+
 [tool.hatch.envs.default]
 dependencies = [
     "pyrenode3[all]",
 ]
-
-[tool.hatch.envs.default.scripts]
-interact = "python -m pyrenode3"
 
 [tool.hatch.version]
 path = "src/pyrenode3/__about__.py"
