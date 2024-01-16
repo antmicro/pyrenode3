@@ -25,6 +25,7 @@ test-mono-pkg:
     # Download Renode pkg
     - wget --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
   script:
+    - export PYRENODE_RUNTIME=mono
     - export PYRENODE_PKG=$(pwd)/renode-latest.pkg.tar.xz
     - *run_tests
 
@@ -45,5 +46,21 @@ test-dotnet-build:
     - pushd renode && ./build.sh --net && popd
   script:
     - export PYRENODE_RUNTIME=coreclr
+    - export PYRENODE_BUILD_DIR=$(pwd)/renode
+    - *run_tests
+
+test-mono-build:
+  stage: build
+  tags: ['ace-x86_64']
+  variables:
+    JOB_DEPS: gtk-sharp2 mono-complete
+  before_script:
+    - *install_dependencies
+    - *init_python
+    # Build Renode
+    - git clone https://github.com/antmicro/renode.git
+    - pushd renode && ./build.sh && popd
+  script:
+    - export PYRENODE_RUNTIME=mono
     - export PYRENODE_BUILD_DIR=$(pwd)/renode
     - *run_tests
