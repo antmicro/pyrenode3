@@ -1,13 +1,49 @@
-build:
-  image: "d2s://external/docker/debian:bookworm"
+image: "d2s://external/docker/debian:bookworm"
+
+variables:
+  COMMON_DEPS: git autoconf automake coreutils g++ gcc libgtk2.0-0 libtool policykit-1 python3 python3 python3-pip python3-venv screen uml-utilities wget
+
+.install-dependencies: &install_dependencies |-
+    apt -qqy update &> /dev/null
+    apt -qqy install ${COMMON_DEPS} ${JOB_DEPS}
+
+.init-python: &init_python |-
+    python3 -m venv .venv && source .venv/bin/activate
+    pip install .
+
+.run-tests: &run_tests |
+  for i in examples/*; do echo "Running test $i..."; python3 $i; done
+
+test-mono-pkg:
+  stage: build
+  tags: ['ace-x86_64']
+  variables:
+    JOB_DEPS: gtk-sharp2 mono-complete
+  before_script:
+    - *install_dependencies
+    - *init_python
+    # Download Renode pkg
+    - wget --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
+  script:
+    - export PYRENODE_PKG=$(pwd)/renode-latest.pkg.tar.xz
+    - *run_tests
+
+test-dotnet-build:
   stage: build
   tags: ['ace-x86_64']
   before_script:
-    - apt -qqy update 2> /dev/null > /dev/null
-    - apt -qqy install git automake autoconf libtool g++ coreutils policykit-1 uml-utilities python3 mono-complete python3 python3-pip wget
+    - *install_dependencies
+    - *init_python
+    # Install dotnet
+    - wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb
+    - dpkg -i packages-microsoft-prod.deb
+    - rm packages-microsoft-prod.deb
+    - apt -qqy update && apt -qqy install -y dotnet-sdk-7.0 dotnet-runtime-6.0
+    - dotnet --list-sdks && dotnet --list-runtimes
+    # Build Renode
+    - git clone https://github.com/antmicro/renode.git
+    - pushd renode && ./build.sh --net && popd
   script:
-    - wget --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
-    - export PYRENODE_ARCH_PKG=`pwd`/renode-latest.pkg.tar.xz
-    - python3 -m pip install --break-system-packages .
-    - for i in examples/*; do echo "Running test $i..."; python3 $i; done
-
+    - export PYRENODE_RUNTIME=coreclr
+    - export PYRENODE_BUILD_DIR=$(pwd)/renode
+    - *run_tests
