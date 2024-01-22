@@ -23,6 +23,7 @@ if "PYRENODE_SKIP_LOAD" not in os.environ:
 
     elif build_dir := os.environ.get("PYRENODE_BUILD_DIR"):
         if runtime == "mono":
+            logging.warning("Using mono with Renode built from sources might not work correctly.")
             RenodeLoader.from_mono_build(build_dir)
         elif runtime == "coreclr":
             RenodeLoader.from_net_build(build_dir)
