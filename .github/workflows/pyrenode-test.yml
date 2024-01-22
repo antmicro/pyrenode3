@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-20.04
     env:
-      PYRENODE_ARCH_PKG: "renode.pkg.tar.xz"
+      PYRENODE_PKG: "renode.pkg.tar.xz"
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
       - name: Prepare pyrenode
         run: |
           mono --version
-          wget -O $PYRENODE_ARCH_PKG --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
+          wget -O $PYRENODE_PKG --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
           python3 -m pip install .
 
       - name: Run examples
