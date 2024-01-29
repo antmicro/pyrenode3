@@ -20,7 +20,7 @@ if not env.pyrenode_skip_load:
         if runtime == "mono":
             RenodeLoader.from_mono_arch_pkg(env.pyrenode_pkg)
         elif runtime == "coreclr":
-            raise ImportError("Using dotnet package is not supported.")
+            RenodeLoader.from_net_pkg(env.pyrenode_pkg)
 
     elif env.pyrenode_build_dir:
         if runtime == "mono":

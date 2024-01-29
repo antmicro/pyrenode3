@@ -34,6 +34,17 @@ def ensure_symlink(src, dst, relative=False, verbose=False):
         logging.warning(f"{src} -> {dst}")
 
 
+def ensure_additional_libs(renode_bin_dir):
+    # HACK: move libMonoPosixHelper.so to path where it is searched for
+    bindll_dir = renode_bin_dir / "runtimes/linux-x64"
+    src = bindll_dir / "native/libMonoPosixHelper.so"
+    netstd_dir = bindll_dir / "lib/netstandard2.0"
+
+    ensure_symlink(src, netstd_dir / "libMonoPosixHelper.so", relative=True, verbose=True)
+
+    return [netstd_dir / "Mono.Posix.NETStandard.dll"]
+
+
 class RenodeLoader(metaclass=MetaSingleton):
     """A class used for loading Renode DLLs, platforms and scripts from various sources."""
 
@@ -132,15 +143,22 @@ class RenodeLoader(metaclass=MetaSingleton):
         return loader
 
     @classmethod
-    def from_net_build(cls, path: "Union[str, pathlib.Path]"):
-        renode_dir = pathlib.Path(path)
-        renode_bin_dir = cls.discover_bin_dir(renode_dir, "coreclr")
+    def from_net_pkg(cls, path: "Union[str, pathlib.Path]"):
+        """Load Renode from dotnet package."""
+        path = pathlib.Path(path)
+        temp = tempfile.TemporaryDirectory()
+        with tarfile.open(path, "r") as f:
+            f.extractall(temp.name)
 
-        # HACK: move libMonoPosixHelper.so to path where it is searched for
-        bindll_dir = renode_bin_dir / "runtimes/linux-x64"
-        src = bindll_dir / "native/libMonoPosixHelper.so"
-        netstd_dir = bindll_dir / "lib/netstandard2.0"
-        ensure_symlink(src, netstd_dir / "libMonoPosixHelper.so", relative=True, verbose=True)
+        renode_dirs = list(pathlib.Path(temp.name).glob("renode*"))
+        if len(renode_dirs) > 1:
+            logging.error(f"In {path} package should be exactly one directory. Found {len(renode_dirs)}.")
+            sys.exit(1)
+
+        renode_dir = renode_dirs[0]
+        renode_bin_dir = renode_dir / "bin"
+
+        additional_libs = ensure_additional_libs(renode_bin_dir)
 
         pythonnet_load("coreclr", runtime_config=renode_bin_dir / "Renode.runtimeconfig.json")
 
@@ -148,9 +166,26 @@ class RenodeLoader(metaclass=MetaSingleton):
         loader.__setup(
             renode_bin_dir,
             renode_dir,
-            add_dlls=[netstd_dir / "Mono.Posix.NETStandard.dll"],
+            temp=temp,
+            add_dlls=additional_libs,
         )
+        return loader
 
+    @classmethod
+    def from_net_build(cls, path: "Union[str, pathlib.Path]"):
+        renode_dir = pathlib.Path(path)
+        renode_bin_dir = cls.discover_bin_dir(renode_dir, "coreclr")
+
+        additional_libs = ensure_additional_libs(renode_bin_dir)
+
+        pythonnet_load("coreclr", runtime_config=renode_bin_dir / "Renode.runtimeconfig.json")
+
+        loader = cls()
+        loader.__setup(
+            renode_bin_dir,
+            renode_dir,
+            add_dlls=additional_libs,
+        )
         return loader
 
     @classmethod
