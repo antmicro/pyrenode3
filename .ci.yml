@@ -4,8 +4,16 @@ variables:
   COMMON_DEPS: git autoconf automake coreutils g++ gcc libgtk2.0-0 libtool policykit-1 python3 python3 python3-pip python3-venv screen uml-utilities wget
 
 .install-dependencies: &install_dependencies |-
-    apt -qqy update &> /dev/null
-    apt -qqy install ${COMMON_DEPS} ${JOB_DEPS}
+    apt-get -qqy update &> /dev/null
+    apt-get -qqy install ${COMMON_DEPS} ${JOB_DEPS}
+
+.install-dotnet: &install_dotnet |-
+    wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb
+    dpkg -i packages-microsoft-prod.deb
+    rm packages-microsoft-prod.deb
+    apt-get -qqy update &> /dev/null
+    apt-get -qqy install -y dotnet-sdk-7.0 dotnet-runtime-6.0 &> /dev/null
+    dotnet --list-sdks && dotnet --list-runtimes
 
 .init-python: &init_python |-
     python3 -m venv .venv && source .venv/bin/activate
@@ -27,7 +35,7 @@ test-mono-pkg:
     - wget --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
   script:
     - export PYRENODE_RUNTIME=mono
-    - export PYRENODE_PKG=$(pwd)/renode-latest.pkg.tar.xz
+    - export PYRENODE_PKG=$PWD/renode-latest.pkg.tar.xz
     - *run_tests
 
 test-installed-pkg:
@@ -49,13 +57,8 @@ test-dotnet-build:
   tags: ['ace-x86_64']
   before_script:
     - *install_dependencies
+    - *install_dotnet
     - *init_python
-    # Install dotnet
-    - wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb
-    - dpkg -i packages-microsoft-prod.deb
-    - rm packages-microsoft-prod.deb
-    - apt -qqy update && apt -qqy install -y dotnet-sdk-7.0 dotnet-runtime-6.0
-    - dotnet --list-sdks && dotnet --list-runtimes
     # Build Renode
     - git clone https://github.com/antmicro/renode.git
     - pushd renode && ./build.sh --net && popd
@@ -76,6 +79,20 @@ test-dotnet-portable:
     - tar xvf renode-latest.linux-portable-dotnet.tar.gz
     - export PYRENODE_RUNTIME=coreclr
     - export PYRENODE_BIN=$(realpath $PWD/renode_*-dotnet_portable/renode)
+
+test-dotnet-pkg:
+  stage: build
+  tags: ['ace-x86_64']
+  variables:
+    JOB_DEPS: curl jq zip
+  before_script:
+    - *install_dependencies
+    - *install_dotnet
+    - *init_python
+    - curl -s https://builds.renode.io/renode-latest.linux-dotnet.tar.gz -o renode-dotnet.tar.gz
+  script:
+    - export PYRENODE_RUNTIME=coreclr
+    - export PYRENODE_PKG=$PWD/renode-dotnet.tar.gz
     - *run_tests
 
 test-mono-build:
