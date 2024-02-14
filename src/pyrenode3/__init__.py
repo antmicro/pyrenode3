@@ -1,38 +1,39 @@
 import importlib
 import logging
-import os
 
 from pyrenode3.loader import RenodeLoader
+from pyrenode3 import env
 
-if "PYRENODE_SKIP_LOAD" not in os.environ:
-    runtime = os.environ.get("PYRENODE_RUNTIME", "mono")
+
+if not env.pyrenode_skip_load:
+    runtime = env.pyrenode_runtime
 
     if runtime not in ["mono", "coreclr"]:
         raise ImportError(f"Runtime '{runtime}' not supported")
 
-    if os.environ.get("PYRENODE_PKG") and os.environ.get("PYRENODE_BUILD_DIR"):
+    if env.pyrenode_pkg and env.pyrenode_build_dir:
         raise ImportError(
-            "Both PYRENODE_PKG and PYRENODE_BUILD_DIR are set. Please unset one of them."
+            f"Both {env.PYRENODE_PKG} and {env.PYRENODE_BUILD_DIR} are set. "
+            "Please unset one of them."
         )
 
-    if package := os.environ.get("PYRENODE_PKG"):
+    if env.pyrenode_pkg:
         if runtime == "mono":
-            RenodeLoader.from_mono_arch_pkg(package)
+            RenodeLoader.from_mono_arch_pkg(env.pyrenode_pkg)
         elif runtime == "coreclr":
             raise ImportError("Using dotnet package is not supported.")
 
-    elif build_dir := os.environ.get("PYRENODE_BUILD_DIR"):
+    elif env.pyrenode_build_dir:
         if runtime == "mono":
             logging.warning("Using mono with Renode built from sources might not work correctly.")
-            RenodeLoader.from_mono_build(build_dir)
+            RenodeLoader.from_mono_build(env.pyrenode_build_dir)
         elif runtime == "coreclr":
-            RenodeLoader.from_net_build(build_dir)
+            RenodeLoader.from_net_build(env.pyrenode_build_dir)
 
     if not RenodeLoader().is_initialized:
         msg = (
-            "Renode not found. Please set PYRENODE_ARCH_PKG to the location of Renode Arch package."
-            "Set PYRENODE_PKG to the location of Renode package or PYRENODE_BUILD_DIR to the"
-            "location of Renode build directory."
+            f"Renode not found. Please set {env.PYRENODE_PKG} to the location of Renode package or "
+            f"{env.PYRENODE_BUILD_DIR} to the location of Renode build directory."
         )
         raise ImportError(msg)
 

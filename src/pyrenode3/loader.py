@@ -10,6 +10,7 @@ from typing import Union
 
 from pythonnet import load as pythonnet_load
 
+from pyrenode3 import env
 from pyrenode3.singleton import MetaSingleton
 
 
@@ -71,9 +72,8 @@ class RenodeLoader(metaclass=MetaSingleton):
 
     @staticmethod
     def discover_bin_dir(renode_dir, runtime):
-        if "PYRENODE_BUILD_OUTPUT" in os.environ:
-            build_out = os.environ["PYRENODE_BUILD_OUTPUT"]
-            renode_build_dir = renode_dir / build_out
+        if env.pyrenode_build_output:
+            renode_build_dir = renode_dir / env.pyrenode_build_output
 
             if not renode_build_dir.exists():
                 logging.critical(f"{renode_build_dir} doesn't exist.")
@@ -89,7 +89,7 @@ class RenodeLoader(metaclass=MetaSingleton):
                 logging.critical(
                     f"Can't determine Renode directory using the '{renode_dir / default}' pattern. "
                     f"Please specify its path (relative to {renode_dir}) in the "
-                    "PYRENODE_BUILD_OUTPUT variable."
+                    f"{env.PYRENODE_BUILD_OUTPUT} variable."
                 )
                 sys.exit(1)
 
