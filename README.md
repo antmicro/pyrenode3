@@ -50,6 +50,6 @@ If no variable is specified `pyrenode3` will look for the Renode installed in yo
 |                    | Mono               | .NET               |
 | :----------------- | :----------------: | :----------------: |
 | Installed          | :white_check_mark: | :x:                |
-| Package            | :white_check_mark: | :x:                |
+| Package            | :white_check_mark: | :white_check_mark: |
 | Built from sources | :white_check_mark: | :white_check_mark: |
 | Portable binary    | :x:                | :white_check_mark: |
