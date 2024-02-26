@@ -29,6 +29,20 @@ test-mono-pkg:
     - export PYRENODE_PKG=$(pwd)/renode-latest.pkg.tar.xz
     - *run_tests
 
+test-installed-pkg:
+  stage: build
+  tags: ['ace-x86_64']
+  variables:
+    JOB_DEPS: gtk-sharp2 mono-complete
+  before_script:
+    - *install_dependencies
+    - *init_python
+    # Download and install Renode
+    - wget --progress=dot:giga https://builds.renode.io/renode-latest.deb
+    - apt-get install ./renode-latest.deb
+  script:
+    - *run_tests
+
 test-dotnet-build:
   stage: build
   tags: ['ace-x86_64']
