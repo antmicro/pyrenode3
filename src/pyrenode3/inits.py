@@ -85,7 +85,7 @@ class XwtInit(metaclass=MetaSingleton):
         if self.provider is None:
             return False
 
-        Cleaner().add(11, self.__cleanup)
+        Cleaner().add(3, self.__cleanup)
 
         return True
 
