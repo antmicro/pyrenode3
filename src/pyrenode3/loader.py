@@ -244,6 +244,31 @@ class RenodeLoader(metaclass=MetaSingleton):
 
         return loader
 
+    @classmethod
+    def from_installed(cls):
+        try:
+            version = check_output(["renode", "--version"])
+        except FileNotFoundError:
+            return None
+
+        # TODO: Determine the runtime based on version string.
+        #       (But currently version string doesn't contain runtime information.)
+
+        # XXX: Assume that Renode is installed in /opt/renode. Once it is possible to install Renode
+        #      to different location this must be changed!
+        renode_dir = pathlib.Path("/opt/renode")
+
+        loader = cls()
+        loader.__setup(
+            renode_dir / "bin",
+            renode_dir,
+            # XXX: Assume Mono runtime. Currently only Mono version can be installed as package.
+            runtime="mono",
+            add_dlls=["Renode.exe"]
+        )
+
+        return loader
+
     @contextmanager
     def in_root(self):
         last_cwd = os.getcwd()

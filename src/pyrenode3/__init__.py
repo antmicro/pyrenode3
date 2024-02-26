@@ -35,11 +35,16 @@ if not env.pyrenode_skip_load:
         elif runtime == "coreclr":
             RenodeLoader.from_net_bin(env.pyrenode_bin)
 
+    else:
+        RenodeLoader.from_installed()
+
     if not RenodeLoader().is_initialized:
         msg = (
-            f"Renode not found. Please set {env.PYRENODE_PKG} to the location of Renode package "
-            f"or {env.PYRENODE_BUILD_DIR} to the location of Renode build directory, "
-            f"or {env.PYRENODE_BIN} to the location of Renode portable binary."
+            f"Renode not found. Please do one of following actions:\n"
+            f"   - install Renode from a package\n"
+            f"   - set {env.PYRENODE_PKG} to the location of the Renode package\n"
+            f"   - set {env.PYRENODE_BUILD_DIR} to the location of the Renode build directory\n"
+            f"   - set {env.PYRENODE_BIN} to the location of the Renode portable binary\n"
         )
         raise ImportError(msg)
 
