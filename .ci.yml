@@ -12,7 +12,7 @@ variables:
     pip install .
 
 .run-tests: &run_tests |
-  for i in examples/*; do echo "Running test $i..."; python3 $i; done
+  for i in examples/*; do echo "Running test $i..."; timeout 240 python3 $i; done
 
 test-mono-pkg:
   stage: build
