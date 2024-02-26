@@ -54,14 +54,16 @@ class EmulatorInit(metaclass=MetaSingleton):
 
         Emulator.ShowAnalyzers = True
 
-        Emulator.BeforeExit += Emulator.DisposeAll
-
         self.__thread = Thread(target=Emulator.ExecuteAsMainThread, daemon=True)
         self.__thread.start()
 
         Cleaner().add_multiple(
             (0, EmulationManager.Instance.Clear),
-            (10, Emulator.FinishExecutionAsMainThread),
+            (5, Emulator.FinishExecutionAsMainThread),
+            # Wait for the main thread to finish
+            (6, lambda: self.__thread.join()),
+            (10, Emulator.DisposeAll),
+            (15, Emulator.Exit),
         )
 
 
@@ -83,7 +85,7 @@ class XwtInit(metaclass=MetaSingleton):
         if self.provider is None:
             return False
 
-        Cleaner().add(3, self.__cleanup)
+        Cleaner().add(11, self.__cleanup)
 
         return True
 
