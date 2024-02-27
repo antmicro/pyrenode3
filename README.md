@@ -37,6 +37,7 @@ This will spawn a two-machine demo scenario and, when the Linux boots to shell, 
     To modify the output directory used as a source of Renode binaries (location of `Renode.exe`), you must set the `PYRENODE_BUILD_OUTPUT` variable, with a path relative to `PYRENODE_BUILD_DIR`.
 - `PYRENODE_RUNTIME` -- Specifies runtime which is used to run Renode.
     Supported runtimes: `mono` (default), `dotnet` (.NET).
+- `PYRENODE_BIN` -- Specifies the location of Renode portable binary that will be used by `pyrenode3`.
 
 `PYRENODE_PKG` and `PYRENODE_BUILD_DIR` are mutually exclusive.
 Exactly one of them must be specified to use `pyrenode3` successfully.
@@ -47,3 +48,4 @@ Exactly one of them must be specified to use `pyrenode3` successfully.
 | :----------------- | :----------------: | :----------------: |
 | Package            | :white_check_mark: | :x:                |
 | Built from sources | :white_check_mark: | :white_check_mark: |
+| Portable binary    | :x:                | :white_check_mark: |

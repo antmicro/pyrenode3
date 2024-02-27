@@ -9,12 +9,11 @@ if not env.pyrenode_skip_load:
     runtime = env.pyrenode_runtime
 
     if runtime not in ["mono", "coreclr"]:
-        raise ImportError(f"Runtime '{runtime}' not supported")
+        raise ImportError(f"Runtime {runtime!r} not supported")
 
-    if env.pyrenode_pkg and env.pyrenode_build_dir:
+    if sum(map(bool, (env.pyrenode_pkg, env.pyrenode_build_dir, env.pyrenode_bin))) > 1:
         raise ImportError(
-            f"Both {env.PYRENODE_PKG} and {env.PYRENODE_BUILD_DIR} are set. "
-            "Please unset one of them."
+            f"Multiple of {env.PYRENODE_PKG}, {env.PYRENODE_BUILD_DIR}, {env.PYRENODE_BIN} are set. Please unset all but one of them."
         )
 
     if env.pyrenode_pkg:
@@ -30,10 +29,17 @@ if not env.pyrenode_skip_load:
         elif runtime == "coreclr":
             RenodeLoader.from_net_build(env.pyrenode_build_dir)
 
+    elif env.pyrenode_bin:
+        if runtime == "mono":
+            raise ImportError("Using mono portable binary is not supported.")
+        elif runtime == "coreclr":
+            RenodeLoader.from_net_bin(env.pyrenode_bin)
+
     if not RenodeLoader().is_initialized:
         msg = (
-            f"Renode not found. Please set {env.PYRENODE_PKG} to the location of Renode package or "
-            f"{env.PYRENODE_BUILD_DIR} to the location of Renode build directory."
+            f"Renode not found. Please set {env.PYRENODE_PKG} to the location of Renode package "
+            f"or {env.PYRENODE_BUILD_DIR} to the location of Renode build directory, "
+            f"or {env.PYRENODE_BIN} to the location of Renode portable binary."
         )
         raise ImportError(msg)
 
