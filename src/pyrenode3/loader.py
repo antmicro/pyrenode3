@@ -1,14 +1,18 @@
 import glob
+import json
 import logging
 import os
 import pathlib
+import re
 import sys
 import tarfile
 import tempfile
 from contextlib import contextmanager
 from typing import Union
+from subprocess import check_output, STDOUT
 
 from pythonnet import load as pythonnet_load
+from clr_loader.util.runtime_spec import DotnetCoreRuntimeSpec
 
 from pyrenode3 import env
 from pyrenode3.singleton import MetaSingleton
@@ -16,6 +20,18 @@ from pyrenode3.singleton import MetaSingleton
 
 class InitializationError(Exception):
     ...
+
+
+def ensure_symlink(src, dst, relative=False, verbose=False):
+    if relative:
+        src = os.path.relpath(src, dst.parent)
+    try:
+        dst.symlink_to(src)
+    except FileExistsError:
+        return
+    if verbose:
+        logging.warning(f"{dst.name} is not in the expected location. Created symlink.")
+        logging.warning(f"{src} -> {dst}")
 
 
 class RenodeLoader(metaclass=MetaSingleton):
@@ -59,11 +75,12 @@ class RenodeLoader(metaclass=MetaSingleton):
 
         renode_dir = pathlib.Path(temp.name) / "opt/renode"
 
+        pythonnet_load("mono")
+
         loader = cls()
         loader.__setup(
             renode_dir / "bin",
             renode_dir,
-            runtime="mono",
             temp=temp,
             add_dlls=["Renode.exe"]
         )
@@ -102,11 +119,13 @@ class RenodeLoader(metaclass=MetaSingleton):
     def from_mono_build(cls, path: "Union[str, pathlib.Path]"):
         """Load Renode from Mono build."""
         renode_dir = pathlib.Path(path)
+
+        pythonnet_load("mono")
+
         loader = cls()
         loader.__setup(
             cls.discover_bin_dir(renode_dir, "mono"),
             renode_dir,
-            runtime="mono",
             add_dlls=["Renode.exe"]
         )
 
@@ -118,21 +137,110 @@ class RenodeLoader(metaclass=MetaSingleton):
         renode_bin_dir = cls.discover_bin_dir(renode_dir, "coreclr")
 
         # HACK: move libMonoPosixHelper.so to path where it is searched for
-        src = renode_bin_dir / "runtimes/linux-x64/native/libMonoPosixHelper.so"
-        dst = renode_bin_dir / "runtimes/linux-x64/lib/netstandard2.0/libMonoPosixHelper.so"
-        if not dst.exists():
-            src_path = os.path.relpath(src, dst.parent)
-            logging.warning("libMonoPosixHelper.so is not in the expected location. Creating symlink.")
-            logging.warning(f"{src_path} -> {dst}")
-            os.symlink(src_path, dst)
+        bindll_dir = renode_bin_dir / "runtimes/linux-x64"
+        src = bindll_dir / "native/libMonoPosixHelper.so"
+        netstd_dir = bindll_dir / "lib/netstandard2.0"
+        ensure_symlink(src, netstd_dir / "libMonoPosixHelper.so", relative=True, verbose=True)
+
+        pythonnet_load("coreclr", runtime_config=renode_bin_dir / "Renode.runtimeconfig.json")
 
         loader = cls()
         loader.__setup(
             renode_bin_dir,
             renode_dir,
-            runtime="coreclr",
-            add_dlls=["runtimes/linux-x64/lib/netstandard2.0/Mono.Posix.NETStandard.dll"],
+            add_dlls=[netstd_dir / "Mono.Posix.NETStandard.dll"],
         )
+
+        return loader
+
+    @classmethod
+    def from_net_bin(cls, path: "Union[str, pathlib.Path]"):
+        """Load Renode from binary."""
+        renode_bin = pathlib.Path(path)
+        renode_dir = renode_bin.parent
+
+        # As a side effect, executing the binary causes the embedded dlls to be extracted to:
+        #     ~/.net/<executable name>/<executable hash>/
+        # The location gets printed to stderr (or selected file) if suitable environment variables are set.
+        out = check_output([renode_bin, "--version"], stderr=STDOUT, env=os.environ | {"COREHOST_TRACE": "1", "COREHOST_TRACEFILE": ""}, text=True)
+
+        binaries = re.search(r"will be extracted to \[(.*)\] directory", out).group(1)
+        binaries = pathlib.Path(binaries)
+
+        # There should be *some* way to specify a dll PATH, but it does not 'just work' e.g. in runtimeconfig.json.
+        # As a workaround, we create a directory hierarchy (can be anywhere, but we use ~/.net/...) like
+        #     shared/Microsoft.NETCore.App/6.0.26/
+        #         libclrjit.so
+        #         libcoreclr.so
+        #         libSystem.Native.so
+        #         libSystem.Security.Cryptography.Native.OpenSsl.so
+        #         Microsoft.CSharp.dll
+        #         ...
+        #         Microsoft.NETCore.App.deps.json
+        # The DLLs are extracted, the .so libs are blended into the .text of the executable, so we ship them,
+        # and the deps.json can be pretty much any deps.json file, so we use the extracted Renode.deps.json.
+
+        # We need to find *some* runtime version, although 6.0.0 is 'good enough' if we find nothing else.
+        # Luckily, deps.json has the runtime version info, and a list of system DLLs:
+        # {
+        #     "runtimeTarget": {
+        #       "name": ".NETCoreApp,Version=v6.0/linux-x64",
+        #       "signature": ""
+        #     },
+        #     "compilationOptions": {},
+        #     "targets": {
+        #       ".NETCoreApp,Version=v6.0": {},
+        #       ".NETCoreApp,Version=v6.0/linux-x64": {
+        #         "Renode/1.0.0": {
+        #           "dependencies": {
+        #             "AntShell": "1.0.0",
+        #             ...
+        #             "runtimepack.Microsoft.NETCore.App.Runtime.linux-x64": "6.0.26"
+        #           },
+        #           "runtime": {
+        #             "Renode.dll": {}
+        #           }
+        #         },
+        #         "runtimepack.Microsoft.NETCore.App.Runtime.linux-x64/6.0.26": {
+        #           "runtime": {
+        #             "Microsoft.CSharp.dll": {
+        #               "assemblyVersion": "6.0.0.0",
+        #               "fileVersion": "6.0.2623.60508"
+        #             },
+        #             "Microsoft.VisualBasic.Core.dll": { ... },
+        #  }}}}}
+        SYSTEM_RUNTIME = "runtimepack.Microsoft.NETCore.App.Runtime.linux-x64"
+
+        deps = json.load(open(binaries / "Renode.deps.json", "rb"))
+        target = deps["targets"][deps["runtimeTarget"]["name"]]
+        for lib, dlls in target.items():
+            name, version = lib.split("/")
+            if name == SYSTEM_RUNTIME:
+                tfm_full = version
+                system_dlls = list(dlls["runtime"])
+                break
+        else:
+            tfm_full = "6.0.0"
+            system_dlls = [dll.name for dll in binaries.glob("*.dll")]
+            logging.warning(f"Could not find {SYSTEM_RUNTIME} in deps.json. "
+                            f"Assuming framework version {tfm_full}.")
+
+        runtime = binaries / "shared/Microsoft.NETCore.App" / tfm_full
+        runtime.mkdir(parents=True, exist_ok=True)
+        for lib in renode_dir.glob("*.so"):
+            ensure_symlink(lib, runtime / lib.name)
+
+        for lib in system_dlls:
+            ensure_symlink(binaries / lib, runtime / lib, relative=True)
+
+        ensure_symlink(renode_dir / "libhostfxr.so", binaries / "libhostfxr.so")
+        ensure_symlink(binaries / "Renode.deps.json", runtime / "Microsoft.NETCore.App.deps.json", relative=True)
+
+        loader = cls()
+        loader.__renode_dir = renode_dir
+        with loader.in_root():
+            pythonnet_load("coreclr", dotnet_root=binaries, runtime_spec=DotnetCoreRuntimeSpec("Microsoft.NETCore.App", tfm_full, runtime))
+        loader.__setup(binaries, renode_dir)
 
         return loader
 
@@ -145,38 +253,25 @@ class RenodeLoader(metaclass=MetaSingleton):
         finally:
             os.chdir(last_cwd)
 
-    def __load_runtime(self):
-        params = {}
-        if self.__runtime ==  "coreclr":
-            # When using .NET Renode and the runtimeconfig.json file is present we should use that
-            # to specify exactly the runtime that is expected.
-            runtime_config = self.__bin_dir / "Renode.runtimeconfig.json"
-            if runtime_config.exists():
-                params["runtime_config"]  = runtime_config
-            else:
-                logging.warning(
-                    "Can't find the Renode.runtimeconfig.json file. "
-                    "Will use a default pythonnet runtime settings."
-                )
-
-        pythonnet_load(self.__runtime, **params)
-
     def __load_asm(self):
         # Import clr here, because it must be done after the proper runtime is selected.
         # If the runtime isn't loaded, the clr module loads the default runtime (mono) automatically.
         # It is an issue when we use non-default runtime, e.g. coreclr.
         import clr
 
-        dlls = [*glob.glob(str(self.binaries / "*.dll"))]
+        dlls = [*self.binaries.glob("*.dll")]
         dlls.extend(self.__extra.get("add_dlls", []))
 
         for dll in dlls:
-            clr.AddReference(str(self.binaries / dll))
+            fullpath = self.binaries / dll
+            # We do not normally ship CoreLib (except portable), and it gets loaded by other dlls anyway, but loading it directly raises an error:
+            # System.IO.FileLoadException: Could not load file or assembly 'System.Private.CoreLib, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e'.
+            if fullpath.exists() and fullpath.name != "System.Private.CoreLib.dll":
+                clr.AddReference(str(fullpath))
 
     def __setup(self,
         bin_dir: "Union[str, pathlib.Path]",
         renode_dir: "Union[str, pathlib.Path]",
-        runtime: str,
         **kwargs,
     ):
         if self.__initialized:
@@ -185,10 +280,7 @@ class RenodeLoader(metaclass=MetaSingleton):
 
         self.__bin_dir = pathlib.Path(bin_dir).absolute()
         self.__renode_dir = pathlib.Path(renode_dir).absolute()
-        self.__runtime = runtime
         self.__extra = kwargs
-
-        self.__load_runtime()
 
         self.__load_asm()
 

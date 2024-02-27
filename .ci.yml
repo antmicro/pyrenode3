@@ -46,7 +46,21 @@ test-dotnet-build:
     - pushd renode && ./build.sh --net && popd
   script:
     - export PYRENODE_RUNTIME=coreclr
-    - export PYRENODE_BUILD_DIR=$(pwd)/renode
+    - export PYRENODE_BUILD_DIR=$PWD/renode
+    - *run_tests
+
+test-dotnet-portable:
+  stage: build
+  tags: ['ace-x86_64']
+  before_script:
+    - *install_dependencies
+    - *init_python
+    # Download Renode pkg
+    - wget --progress=dot:giga https://builds.renode.io/renode-latest.linux-portable-dotnet.tar.gz
+  script:
+    - tar xvf renode-latest.linux-portable-dotnet.tar.gz
+    - export PYRENODE_RUNTIME=coreclr
+    - export PYRENODE_BIN=$(realpath $PWD/renode_*-dotnet_portable/renode)
     - *run_tests
 
 test-mono-build:
