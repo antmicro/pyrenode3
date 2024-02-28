@@ -1,0 +1,2 @@
+requests
+dts2repl @ git+https://github.com/antmicro/dts2repl.git

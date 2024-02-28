@@ -10,9 +10,10 @@ variables:
 .init-python: &init_python |-
     python3 -m venv .venv && source .venv/bin/activate
     pip install .
+    pip install -r examples/requirements.txt
 
 .run-tests: &run_tests |
-  for i in examples/*; do echo "Running test $i..."; timeout 240 python3 $i; done
+  for i in examples/*.py; do echo "Running test $i..."; timeout 240 python3 $i; done
 
 test-mono-pkg:
   stage: build
