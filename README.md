@@ -11,11 +11,12 @@ Use pip to install pyrenode3:
 pip install 'pyrenode3[all] @ git+https://github.com/antmicro/pyrenode3.git'
 ```
 
-then download Renode Arch package from [here](https://builds.renode.io/renode-latest.pkg.tar.xz) and set `PYRENODE_PKG` to package's location.
+If you have Renode installed, then `pyrenode3` will interact with it.
+Otherwise, if you don't want to install Renode, you can download a Arch package from here and set `PYRENODE_PKG` to its's location.
 
 ## Running a demo
 
-To quickly run a sample demo, install the package and run:
+To quickly run a sample demo, download the package and run:
 
 ```
 wget https://builds.renode.io/renode-latest.pkg.tar.xz
@@ -42,10 +43,13 @@ This will spawn a two-machine demo scenario and, when the Linux boots to shell, 
 `PYRENODE_PKG` and `PYRENODE_BUILD_DIR` are mutually exclusive.
 Exactly one of them must be specified to use `pyrenode3` successfully.
 
+If no variable is specified `pyrenode3` will look for the Renode installed in your operating system.
+
 ### Supported configurations
 
 |                    | Mono               | .NET               |
 | :----------------- | :----------------: | :----------------: |
+| Installed          | :white_check_mark: | :x:                |
 | Package            | :white_check_mark: | :x:                |
 | Built from sources | :white_check_mark: | :white_check_mark: |
 | Portable binary    | :x:                | :white_check_mark: |
