@@ -23,7 +23,8 @@ jobs:
           mono --version
           wget -O $PYRENODE_PKG --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
           python3 -m pip install .
+          python3 -m pip install -r examples/requirements.txt
 
       - name: Run examples
         run: |
-          for i in examples/*; do echo "Running test $i..."; python3 $i; done
+          for i in examples/*.py; do echo "Running test $i..."; python3 $i; done
