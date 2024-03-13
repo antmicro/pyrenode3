@@ -28,12 +28,11 @@ test-mono-pkg:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: gtk-sharp2 mono-complete
-  before_script:
+  script:
     - *install_dependencies
     - *init_python
     # Download Renode pkg
     - wget --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
-  script:
     - export PYRENODE_RUNTIME=mono
     - export PYRENODE_PKG=$PWD/renode-latest.pkg.tar.xz
     - *run_tests
@@ -43,26 +42,24 @@ test-installed-pkg:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: gtk-sharp2 mono-complete
-  before_script:
+  script:
     - *install_dependencies
     - *init_python
     # Download and install Renode
     - wget --progress=dot:giga https://builds.renode.io/renode-latest.deb
     - apt-get install ./renode-latest.deb
-  script:
     - *run_tests
 
 test-dotnet-build:
   stage: build
   tags: ['ace-x86_64']
-  before_script:
+  script:
     - *install_dependencies
     - *install_dotnet
     - *init_python
     # Build Renode
     - git clone https://github.com/antmicro/renode.git
     - pushd renode && ./build.sh --net && popd
-  script:
     - export PYRENODE_RUNTIME=coreclr
     - export PYRENODE_BUILD_DIR=$PWD/renode
     - *run_tests
@@ -70,12 +67,11 @@ test-dotnet-build:
 test-dotnet-portable:
   stage: build
   tags: ['ace-x86_64']
-  before_script:
+  script:
     - *install_dependencies
     - *init_python
     # Download Renode pkg
     - wget --progress=dot:giga https://builds.renode.io/renode-latest.linux-portable-dotnet.tar.gz
-  script:
     - tar xvf renode-latest.linux-portable-dotnet.tar.gz
     - export PYRENODE_RUNTIME=coreclr
     - export PYRENODE_BIN=$(realpath $PWD/renode_*-dotnet_portable/renode)
@@ -85,12 +81,11 @@ test-dotnet-pkg:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: curl jq zip
-  before_script:
+  script:
     - *install_dependencies
     - *install_dotnet
     - *init_python
     - curl -s https://builds.renode.io/renode-latest.linux-dotnet.tar.gz -o renode-dotnet.tar.gz
-  script:
     - export PYRENODE_RUNTIME=coreclr
     - export PYRENODE_PKG=$PWD/renode-dotnet.tar.gz
     - *run_tests
@@ -100,13 +95,12 @@ test-mono-build:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: gtk-sharp2 mono-complete
-  before_script:
+  script:
     - *install_dependencies
     - *init_python
     # Build Renode
     - git clone https://github.com/antmicro/renode.git
     - pushd renode && ./build.sh && popd
-  script:
     - export PYRENODE_RUNTIME=mono
     - export PYRENODE_BUILD_DIR=$(pwd)/renode
     - *run_tests
