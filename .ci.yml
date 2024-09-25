@@ -53,6 +53,8 @@ test-installed-pkg:
 test-dotnet-build:
   stage: build
   tags: ['ace-x86_64']
+  variables:
+    JOB_DEPS: cmake
   script:
     - *install_dependencies
     - *install_dotnet
@@ -94,7 +96,7 @@ test-mono-build:
   stage: build
   tags: ['ace-x86_64']
   variables:
-    JOB_DEPS: gtk-sharp2 mono-complete
+    JOB_DEPS: cmake gtk-sharp2 mono-complete
   script:
     - *install_dependencies
     - *init_python
