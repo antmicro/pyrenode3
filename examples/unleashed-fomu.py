@@ -43,9 +43,9 @@ hifive.LoadPlatformDescriptionFromString("usb: USB.MPFS_USB @ sysbus 0x30020000 
 Analyzer(hifive.sysbus.uart0).Show()
 
 t = TerminalTester(hifive.sysbus.uart0, 60)
-t.WaitFor("buildroot login:", includeUnfinishedLine=True)
+t.WaitFor(["buildroot login:"], includeUnfinishedLine=True)
 t.WriteLine("root")
-t.WaitFor("Password:", includeUnfinishedLine=True)
+t.WaitFor(["Password:"], includeUnfinishedLine=True)
 t.WriteLine("root")
 
 e.externals.usb_connector.RegisterInController(e.hifive.sysbus.usb.internal)
