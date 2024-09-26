@@ -37,12 +37,21 @@ def ensure_symlink(src, dst, relative=False, verbose=False):
 def ensure_additional_libs(renode_bin_dir):
     # HACK: move libMonoPosixHelper.so to path where it is searched for
     bindll_dir = renode_bin_dir / "runtimes/linux-x64"
-    src = bindll_dir / "native/libMonoPosixHelper.so"
-    netstd_dir = bindll_dir / "lib/netstandard2.0"
+    # Updating to Mono.Posix changed the name of this file
+    # so we check for the new one, and fall back on the old one if it is not found
+    lib_new = "libMono.Unix.so"
+    lib_old = "libMonoPosixHelper.so"
+    src_new = bindll_dir / "native" / lib_new
+    src_old = bindll_dir / "native" / lib_old
 
-    ensure_symlink(src, netstd_dir / "libMonoPosixHelper.so", relative=True, verbose=True)
+    if src_new.exists():
+        ensure_symlink(src_new, renode_bin_dir / lib_new, verbose=True)
+        return [renode_bin_dir / "Mono.Posix.dll"]
+    else:
+        netstd_dir = bindll_dir / "lib/netstandard2.0"
+        ensure_symlink(src_old, netstd_dir / lib_old, relative=True, verbose=True)
+        return [netstd_dir / "Mono.Posix.NETStandard.dll"]
 
-    return [netstd_dir / "Mono.Posix.NETStandard.dll"]
 
 
 class RenodeLoader(metaclass=MetaSingleton):
