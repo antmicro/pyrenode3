@@ -7,6 +7,7 @@ import re
 import sys
 import tarfile
 import tempfile
+import platform
 from contextlib import contextmanager
 from typing import Union
 from subprocess import check_output, STDOUT
@@ -35,6 +36,9 @@ def ensure_symlink(src, dst, relative=False, verbose=False):
 
 
 def ensure_additional_libs(renode_bin_dir):
+    # libMono.Unix does not exists on Windows, so just return empty if we are on Windows
+    if platform.system() == "Windows":
+        return []
     # HACK: move libMonoPosixHelper.so to path where it is searched for
     bindll_dir = renode_bin_dir / "runtimes/linux-x64"
     # Updating to Mono.Posix changed the name of this file
