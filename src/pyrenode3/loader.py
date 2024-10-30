@@ -257,7 +257,12 @@ class RenodeLoader(metaclass=MetaSingleton):
         #             },
         #             "Microsoft.VisualBasic.Core.dll": { ... },
         #  }}}}}
-        SYSTEM_RUNTIME = "runtimepack.Microsoft.NETCore.App.Runtime.linux-x64"
+        if platform.system() == "Windows":
+            SYSTEM_RUNTIME = "runtimepack.Microsoft.NETCore.App.Runtime.win-x64"
+            LIB_EXT = ".dll"
+        else:
+            SYSTEM_RUNTIME = "runtimepack.Microsoft.NETCore.App.Runtime.linux-x64"
+            LIB_EXT = ".so"
 
         deps = json.load(open(binaries / "Renode.deps.json", "rb"))
         target = deps["targets"][deps["runtimeTarget"]["name"]]
@@ -275,13 +280,16 @@ class RenodeLoader(metaclass=MetaSingleton):
 
         runtime = binaries / "shared/Microsoft.NETCore.App" / tfm_full
         runtime.mkdir(parents=True, exist_ok=True)
-        for lib in renode_dir.glob("*.so"):
+        for lib in renode_dir.glob("*" + LIB_EXT):
             ensure_symlink(lib, runtime / lib.name)
 
         for lib in system_dlls:
             ensure_symlink(binaries / lib, runtime / lib, relative=True)
 
-        ensure_symlink(renode_dir / "libhostfxr.so", binaries / "libhostfxr.so")
+        if platform.system() == "Windows":
+            ensure_symlink(renode_dir / "hostfxr.dll", binaries / "hostfxr.dll")
+        else:
+            ensure_symlink(renode_dir / "libhostfxr.so", binaries / "libhostfxr.so")
         ensure_symlink(binaries / "Renode.deps.json", runtime / "Microsoft.NETCore.App.deps.json", relative=True)
 
         loader = cls()
@@ -339,7 +347,12 @@ class RenodeLoader(metaclass=MetaSingleton):
             fullpath = self.binaries / dll
             # We do not normally ship CoreLib (except portable), and it gets loaded by other dlls anyway, but loading it directly raises an error:
             # System.IO.FileLoadException: Could not load file or assembly 'System.Private.CoreLib, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e'.
-            if fullpath.exists() and fullpath.name != "System.Private.CoreLib.dll":
+            # sni.dll, hostfxr.dll, and the _cor3.dll files only exists on Windows, and causes a BadImageFormatException if loaded directly
+            if (fullpath.exists() and
+                fullpath.name != "System.Private.CoreLib.dll" and
+                fullpath.name != "sni.dll" and
+                fullpath.name != "hostfxr.dll" and
+                "_cor3.dll" not in fullpath.name):
                 clr.AddReference(str(fullpath))
 
     def __setup(self,
