@@ -40,7 +40,7 @@ class Machine(Wrapper):
         location : str
             path or url to ELF file.
         """
-        self.sysbus.internal.LoadELF(RPath(location).read_file_path)
+        FileLoaderExtensions.LoadELF(self.sysbus.internal, RPath(location).read_file_path)
 
     def load_binary(self, location: str, load_point: int) -> None:
         """Load binary from URL or local filesystem.
