@@ -48,5 +48,5 @@ class Peripheral(Wrapper):
 
     @property
     def __children(self) -> "dict[str, Peripheral]":
-        ps = (Peripheral(x) for x in self.mach.GetChildrenPeripherals(self.internal))
+        ps = (Peripheral(x) for x in self.mach.internal.GetChildrenPeripherals(self.internal))
         return {p.name: p for p in ps if p.name is not None}
