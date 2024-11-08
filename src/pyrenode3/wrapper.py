@@ -5,6 +5,7 @@ from itertools import chain
 from typing import Any, Iterable, Optional
 
 from Antmicro.Renode.Utilities import TypeManager
+from Python.Runtime import PythonException
 
 
 class MethodDispatcher:
@@ -20,6 +21,13 @@ class MethodDispatcher:
             try:
                 return callable(*args, **kwargs)
             except TypeError as e:
+                msg = "Unexpected 'TypeError' occured. This shouldn't happen unless Python.NET changes significantly."
+                try:
+                    if not type(e.__cause__.InnerException.InnerException) == PythonException:
+                        raise RuntimeError(msg) from e
+                except Exception:
+                    raise RuntimeError(msg) from e
+
                 exceptions.append(e)
                 continue
 
