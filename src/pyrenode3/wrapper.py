@@ -87,30 +87,29 @@ class Wrapper:
         """Handle extra elements in ``Wrapper.__getattr__``."""
         return None
 
-    def _get_extension_methods(self) -> "dict[str, Any]":
+    def _get_extension_methods(self) -> "dict[str, set[Any]]":
         methods = defaultdict(set)
         for method in TypeManager.Instance.GetExtensionMethods(self.internal.GetType()):
             dtype = method.DeclaringType
             parent = dtype.Namespace, dtype.Name
             methods[method.Name].add(parent)
 
-        flattened = dict()
-        for method, parents in methods.items():
-            if not parents:
-                continue
-
-            if len(parents) > 1:
-                # msg = f"Multiple classes define '{method}' extension method: {parents}"
-                # raise RuntimeError(msg) # warning should be added there
-                continue
-
-            flattened[method] = next(iter(parents))
-
-        return flattened
+        return methods
 
     def _find_extension_method(self, name: str) -> "Optional[Any]":
         try:
-            mod_name, class_name = self._get_extension_methods()[name]
+            parents = self._get_extension_methods()[name]
+            if len(parents) > 1:
+                parent_strs = ', '.join([f"\'{'.'.join(x)}\'" for x in parents])
+                parent_help = ', '.join([f"\'{'.'.join(x)}.{name}(x, ...)\'" for x in parents])
+                msg_parents = f"one of the extension methods directly: {parent_help}"
+                msg_method = f"class method with 'x.internal.{name}(...)' or " if hasattr(self.internal, name) else ""
+                msg = (
+                    f"'{name}' is defined in multiple extension classes: {parent_strs}. Use {msg_method}{msg_parents}."
+                )
+                raise RuntimeError(msg)
+
+            mod_name, class_name = next(iter(parents))
             return getattr(getattr(import_module(mod_name), class_name), name)
         except KeyError as e:
             raise AttributeError from e
