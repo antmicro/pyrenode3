@@ -121,9 +121,6 @@ class RenodeLoader(metaclass=MetaSingleton):
                 sys.exit(1)
         else:
             default = "output/bin/Release"
-            if runtime == "coreclr":
-                default += "/net*"
-
             dirs = glob.glob(str(renode_dir / default))
 
             if len(dirs) != 1:
