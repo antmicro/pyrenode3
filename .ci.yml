@@ -12,7 +12,7 @@ variables:
     dpkg -i packages-microsoft-prod.deb
     rm packages-microsoft-prod.deb
     apt-get -qqy update &> /dev/null
-    apt-get -qqy install -y dotnet-sdk-7.0 dotnet-runtime-6.0 &> /dev/null
+    apt-get -qqy install -y dotnet-sdk-8.0 dotnet-runtime-6.0 &> /dev/null
     dotnet --list-sdks && dotnet --list-runtimes
 
 .init-python: &init_python |-
