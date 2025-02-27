@@ -34,17 +34,49 @@ def ensure_symlink(src, dst, relative=False, verbose=False):
         logging.warning(f"{dst.name} is not in the expected location. Created symlink.")
         logging.warning(f"{src} -> {dst}")
 
+# Returns the runtime identifier (RID) of the current platform,
+# only handle targets Renode supports
+def get_RID():
+    aarch64_names = set(("arm64", "aarch64"))
+    if platform.machine() in aarch64_names:
+        arch = "arm64"
+    else:
+        arch = "x64"
+    kernel_name = platform.system()
+    if kernel_name == "Linux":
+        os = "linux"
+    elif kernel_name == "Darwin":
+        os = "osx"
+    elif kernel_name == "Windows":
+        os = "win"
+    else:
+        msg = "Operating system " + os + " not recognized"
+        raise InitializationError(msg)
+    return os + '-' + arch
+
+def get_library_ext():
+    kernel_name = platform.system()
+    if kernel_name == "Linux":
+        return ".so"
+    elif kernel_name == "Darwin":
+        return ".dylib"
+    elif kernel_name == "Windows":
+        return ".dll"
+    else:
+        msg = "Operating system " + os + " not recognize"
+        raise InitializationError(msg)
+
 
 def ensure_additional_libs(renode_bin_dir):
     # libMono.Unix does not exists on Windows, so just return empty if we are on Windows
     if platform.system() == "Windows":
         return []
-    # HACK: move libMonoPosixHelper.so to path where it is searched for
-    bindll_dir = renode_bin_dir / "runtimes/linux-x64"
+    # HACK: move libMonoPosixHelper to path where it is searched for
+    bindll_dir = renode_bin_dir / "runtimes" / get_RID()
     # Updating to Mono.Posix changed the name of this file
     # so we check for the new one, and fall back on the old one if it is not found
-    lib_new = "libMono.Unix.so"
-    lib_old = "libMonoPosixHelper.so"
+    lib_new = "libMono.Unix" + get_library_ext()
+    lib_old = "libMonoPosixHelper" + get_library_ext()
     src_new = bindll_dir / "native" / lib_new
     src_old = bindll_dir / "native" / lib_old
 
@@ -254,12 +286,8 @@ class RenodeLoader(metaclass=MetaSingleton):
         #             },
         #             "Microsoft.VisualBasic.Core.dll": { ... },
         #  }}}}}
-        if platform.system() == "Windows":
-            SYSTEM_RUNTIME = "runtimepack.Microsoft.NETCore.App.Runtime.win-x64"
-            LIB_EXT = ".dll"
-        else:
-            SYSTEM_RUNTIME = "runtimepack.Microsoft.NETCore.App.Runtime.linux-x64"
-            LIB_EXT = ".so"
+        SYSTEM_RUNTIME = "runtimepack.Microsoft.NETCore.App.Runtime." + get_RID()
+        LIB_EXT = get_library_ext()
 
         deps = json.load(open(binaries / "Renode.deps.json", "rb"))
         target = deps["targets"][deps["runtimeTarget"]["name"]]
@@ -270,7 +298,7 @@ class RenodeLoader(metaclass=MetaSingleton):
                 system_dlls = list(dlls["runtime"])
                 break
         else:
-            tfm_full = "6.0.0"
+            tfm_full = "8.0.0"
             system_dlls = [dll.name for dll in binaries.glob("*.dll")]
             logging.warning(f"Could not find {SYSTEM_RUNTIME} in deps.json. "
                             f"Assuming framework version {tfm_full}.")
@@ -286,7 +314,7 @@ class RenodeLoader(metaclass=MetaSingleton):
         if platform.system() == "Windows":
             ensure_symlink(renode_dir / "hostfxr.dll", binaries / "hostfxr.dll")
         else:
-            ensure_symlink(renode_dir / "libhostfxr.so", binaries / "libhostfxr.so")
+            ensure_symlink(renode_dir / ("libhostfxr" + LIB_EXT), binaries / ("libhostfxr" + LIB_EXT))
         ensure_symlink(binaries / "Renode.deps.json", runtime / "Microsoft.NETCore.App.deps.json", relative=True)
 
         loader = cls()
