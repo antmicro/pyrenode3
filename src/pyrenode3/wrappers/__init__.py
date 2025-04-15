@@ -5,6 +5,7 @@ from pyrenode3.wrappers.machine import Machine
 from pyrenode3.wrappers.monitor import Monitor
 from pyrenode3.wrappers.peripheral import Peripheral
 from pyrenode3.wrappers.terminaltester import TerminalTester
+from pyrenode3.wrappers.ledtester import LEDTester
 
 __all__ = [
     "Analyzer",
@@ -14,4 +15,5 @@ __all__ = [
     "Monitor",
     "Peripheral",
     "TerminalTester",
+    "LEDTester"
 ]
