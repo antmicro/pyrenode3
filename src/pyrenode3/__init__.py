@@ -1,5 +1,6 @@
 import importlib
 import logging
+import threading
 
 from pyrenode3.loader import RenodeLoader
 from pyrenode3 import env
@@ -47,6 +48,9 @@ if not env.pyrenode_skip_load:
             f"   - set {env.PYRENODE_BIN} to the location of the Renode portable binary\n"
         )
         raise ImportError(msg)
+
+    from System.Threading import Thread
+    Thread.CurrentThread.Name = threading.current_thread().name
 
     # this prevents circular imports
     importlib.import_module("pyrenode3.wrappers")
