@@ -5,6 +5,7 @@ import os
 import pathlib
 import re
 import sys
+import shutil
 import tarfile
 import tempfile
 import platform
@@ -24,14 +25,22 @@ class InitializationError(Exception):
 
 
 def ensure_symlink(src, dst, relative=False, verbose=False):
-    if relative:
-        src = os.path.relpath(src, dst.parent)
+    linktype = "symlink"
     try:
-        dst.symlink_to(src)
+        dst.symlink_to(src if not relative else os.path.relpath(src, dst.parent))
     except FileExistsError:
         return
+    except OSError:
+        try:
+            dst.hardlink_to(src)
+            linktype = "hardlink"
+        except FileExistsError:
+            return
+        except OSError:
+            shutil.copy(src, dst)
+            linktype = "copy"
     if verbose:
-        logging.warning(f"{dst.name} is not in the expected location. Created symlink.")
+        logging.warning(f"{dst.name} is not in the expected location. Created {linktype}.")
         logging.warning(f"{src} -> {dst}")
 
 # Returns the runtime identifier (RID) of the current platform,
