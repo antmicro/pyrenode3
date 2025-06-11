@@ -26,6 +26,7 @@ dynamic = ["version"]
 
 dependencies = [
     "pythonnet>=3.0.1",
+    "pythoncom>=308; os_name == 'nt'",
 ]
 
 [project.optional-dependencies]
