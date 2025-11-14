@@ -126,7 +126,7 @@ test-mono-build:
     - *init_python
     # Build Renode
     - git clone https://github.com/antmicro/renode.git
-    - pushd renode && ./build.sh && popd
+    - pushd renode && ./build.sh --mono && popd
     - export PYRENODE_RUNTIME=mono
     - export PYRENODE_BUILD_DIR=$(pwd)/renode
     - *run_tests
@@ -137,7 +137,7 @@ test-macos-mono-build:
   script:
     - *init_python
     - git clone https://github.com/antmicro/renode.git
-    - pushd renode && ./build.sh && popd
+    - pushd renode && ./build.sh --mono && popd
     - export PYRENODE_RUNTIME=mono
     - export PYRENODE_BUILD_DIR=$(pwd)/renode
     - *run_tests
