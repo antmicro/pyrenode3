@@ -8,12 +8,12 @@ variables:
     apt-get -qqy install ${COMMON_DEPS} ${JOB_DEPS}
 
 .install-dotnet: &install_dotnet |-
-    wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb
-    dpkg -i packages-microsoft-prod.deb
-    rm packages-microsoft-prod.deb
-    apt-get -qqy update &> /dev/null
-    apt-get -qqy install -y dotnet-sdk-8.0 dotnet-runtime-6.0 &> /dev/null
-    dotnet --list-sdks && dotnet --list-runtimes
+    wget https://dot.net/v1/dotnet-install.sh -O /dotnet-install.sh
+    chmod +x /dotnet-install.sh
+    /dotnet-install.sh --version "$DOTNET_VERSION" --install-dir "$HOME/dotnet"
+    export PATH="$HOME/dotnet:$PATH"
+    dotnet --list-sdks
+    dotnet --list-runtimes
 
 .init-python: &init_python |-
     python3 -m venv .venv && source .venv/bin/activate
@@ -55,6 +55,7 @@ test-dotnet-build:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: cmake
+    DOTNET_VERSION: "8.0.416"
   script:
     - *install_dependencies
     - *install_dotnet
@@ -83,6 +84,7 @@ test-dotnet-pkg:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: curl jq zip
+    DOTNET_VERSION: "8.0.416"
   script:
     - *install_dependencies
     - *install_dotnet
