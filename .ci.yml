@@ -8,12 +8,16 @@ variables:
     apt-get -qqy install ${COMMON_DEPS} ${JOB_DEPS}
 
 .install-dotnet: &install_dotnet |-
-    wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb
-    dpkg -i packages-microsoft-prod.deb
-    rm packages-microsoft-prod.deb
-    apt-get -qqy update &> /dev/null
-    apt-get -qqy install -y dotnet-sdk-8.0 dotnet-runtime-6.0 &> /dev/null
-    dotnet --list-sdks && dotnet --list-runtimes
+    echo "verbose = off" > wgetrc_local
+    export WGETRC=wgetrc_local
+    wget --progress=dot:giga https://dot.net/v1/dotnet-install.sh -O /dotnet-install.sh
+    chmod +x /dotnet-install.sh
+    /dotnet-install.sh --version "$DOTNET_VERSION" --install-dir "/opt/dotnet"
+
+.add-dotnet-path: &add_dotnet_path |-
+    export PATH="/opt/dotnet:$PATH"
+    dotnet --list-sdks
+    dotnet --list-runtimes
 
 .init-python: &init_python |-
     python3 -m venv .venv && source .venv/bin/activate
@@ -22,6 +26,12 @@ variables:
 
 .run-tests: &run_tests |
   for i in examples/*.py; do echo "Running test $i..."; timeout 240 python3 $i; done
+
+.dotnet-sdk-versions: &dotnet_sdk_versions
+  - "6.0.428"
+  - "8.0.416"
+  - "9.0.307"
+  - "10.0.100"
 
 test-mono-pkg:
   stage: build
@@ -47,24 +57,31 @@ test-installed-pkg:
     - *init_python
     # Download and install Renode
     - wget --progress=dot:giga https://builds.renode.io/renode-latest.deb
-    - apt-get install ./renode-latest.deb
+    - apt-get -y install ./renode-latest.deb
     - *run_tests
 
-test-dotnet-build:
+.test-dotnet-build:
   stage: build
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: cmake
-  script:
+  before_get_sources:
     - *install_dependencies
+    - DOTNET_VERSION="$CI_PARALLEL_NAME"
     - *install_dotnet
+  script:
     - *init_python
+    - *add_dotnet_path
     # Build Renode
     - git clone https://github.com/antmicro/renode.git
     - pushd renode && ./build.sh --net && popd
     - export PYRENODE_RUNTIME=coreclr
     - export PYRENODE_BUILD_DIR=$PWD/renode
     - *run_tests
+
+test-dotnet-build:
+  extends: .test-dotnet-build
+  parallel: *dotnet_sdk_versions
 
 test-dotnet-portable:
   stage: build
@@ -78,19 +95,26 @@ test-dotnet-portable:
     - export PYRENODE_RUNTIME=coreclr
     - export PYRENODE_BIN=$(realpath $PWD/renode_*-dotnet_portable/renode)
 
-test-dotnet-pkg:
+.test-dotnet-pkg:
   stage: build
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: curl jq zip
-  script:
+  before_get_sources:
     - *install_dependencies
+    - DOTNET_VERSION="$CI_PARALLEL_NAME"
     - *install_dotnet
+  script:
     - *init_python
+    - *add_dotnet_path
     - curl -s https://builds.renode.io/renode-latest.linux-dotnet.tar.gz -o renode-dotnet.tar.gz
     - export PYRENODE_RUNTIME=coreclr
     - export PYRENODE_PKG=$PWD/renode-dotnet.tar.gz
     - *run_tests
+
+test-dotnet-pkg:
+  extends: .test-dotnet-pkg
+  parallel: *dotnet_sdk_versions
 
 test-mono-build:
   stage: build
@@ -102,7 +126,7 @@ test-mono-build:
     - *init_python
     # Build Renode
     - git clone https://github.com/antmicro/renode.git
-    - pushd renode && ./build.sh && popd
+    - pushd renode && ./build.sh --mono && popd
     - export PYRENODE_RUNTIME=mono
     - export PYRENODE_BUILD_DIR=$(pwd)/renode
     - *run_tests
@@ -113,7 +137,7 @@ test-macos-mono-build:
   script:
     - *init_python
     - git clone https://github.com/antmicro/renode.git
-    - pushd renode && ./build.sh && popd
+    - pushd renode && ./build.sh --mono && popd
     - export PYRENODE_RUNTIME=mono
     - export PYRENODE_BUILD_DIR=$(pwd)/renode
     - *run_tests

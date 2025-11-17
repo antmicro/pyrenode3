@@ -387,7 +387,12 @@ class RenodeLoader(metaclass=MetaSingleton):
                 fullpath.name != "sni.dll" and
                 fullpath.name != "hostfxr.dll" and
                 "_cor3.dll" not in fullpath.name):
-                clr.AddReference(str(fullpath))
+                # XXX(pkoscik): Workaround for AssemblyName behavior change in .NET >= 9.0.
+                # In .NET 8, passing a full DLL path (with extension) to AssemblyName(string) raised
+                # FileLoadException, which Python.NET relied on. In .NET 9, the same path is parsed as
+                # a valid assembly name, breaking Python.NET's loading heuristic. Paths without extension
+                # are valid in both runtimes.
+                clr.AddReference(str(fullpath.with_suffix("")))
 
     def __setup(self,
         bin_dir: "Union[str, pathlib.Path]",
