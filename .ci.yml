@@ -28,7 +28,6 @@ variables:
   for i in examples/*.py; do echo "Running test $i..."; timeout 240 python3 $i; done
 
 .dotnet-sdk-versions: &dotnet_sdk_versions
-  - "6.0.428"
   - "8.0.416"
   - "9.0.307"
   - "10.0.100"
