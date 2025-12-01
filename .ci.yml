@@ -65,7 +65,7 @@ test-installed-pkg:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: cmake
-  before_get_sources:
+  before_script:
     - *install_dependencies
     - DOTNET_VERSION="$CI_PARALLEL_NAME"
     - *install_dotnet
@@ -100,7 +100,7 @@ test-dotnet-portable:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: curl jq zip
-  before_get_sources:
+  before_script:
     - *install_dependencies
     - DOTNET_VERSION="$CI_PARALLEL_NAME"
     - *install_dotnet
