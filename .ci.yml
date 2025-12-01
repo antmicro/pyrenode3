@@ -4,8 +4,8 @@ variables:
   COMMON_DEPS: git autoconf automake coreutils g++ gcc libgtk2.0-0 libtool policykit-1 python3 python3 python3-pip python3-venv screen uml-utilities wget
 
 .install-dependencies: &install_dependencies |-
-    apt-get -qqy update &> /dev/null
-    apt-get -qqy install ${COMMON_DEPS} ${JOB_DEPS}
+    apt-get -qqy update > /dev/null
+    apt-get -qqy install ${COMMON_DEPS} ${JOB_DEPS} > /dev/null
 
 .install-dotnet: &install_dotnet |-
     echo "verbose = off" > wgetrc_local
