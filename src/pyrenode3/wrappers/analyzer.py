@@ -8,7 +8,5 @@ from pyrenode3.wrapper import Wrapper
 class Analyzer(Wrapper):
     def __init__(self, peripheral: "wrappers.Peripheral"):
         XwtInit()
-        monitor = wrappers.Monitor()
-        monitor.Machine = peripheral.mach.internal
-        analyzer = ShowBackendAnalyzerCommand(monitor.internal).GetAnalyzer(peripheral.path, None)
+        analyzer = ShowBackendAnalyzerCommand.GetAnalyzer(peripheral.internal, None)
         super().__init__(analyzer)
