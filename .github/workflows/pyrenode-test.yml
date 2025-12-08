@@ -3,7 +3,7 @@ on:
   push:
   workflow_dispatch:
 jobs:
-  build:
+  test:
     runs-on: ubuntu-24.04
     steps:
       - name: Clone repository
