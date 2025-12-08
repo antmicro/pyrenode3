@@ -4,27 +4,34 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: ubuntu-20.04
-    env:
-      PYRENODE_PKG: "renode.pkg.tar.xz"
+    runs-on: ubuntu-24.04
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Prepare dependencies
         run: |
-          sudo apt -qqy update 2> /dev/null > /dev/null
-          sudo apt -y purge mono-complete mono-runtime mono-devel 2> /dev/null > /dev/null
-          sudo apt -y autoremove 2> /dev/null > /dev/null
-          sudo apt -qqy install git automake autoconf libtool g++ coreutils policykit-1 uml-utilities python3 mono-complete=6.8.0.105+dfsg-2 python3 python3-pip wget
+          export DEBIAN_FRONTEND="noninteractive"
+          sudo apt-get -qqy update > /dev/null
+          sudo apt-get -qqy install git autoconf automake coreutils g++ gcc libgtk2.0-0 libtool policykit-1 python3 python3 python3-pip python3-venv screen uml-utilities wget > /dev/null
+
+          echo "verbose = off" > wgetrc_local
+          export WGETRC="wgetrc_local"
+          wget https://dot.net/v1/dotnet-install.sh -O ./dotnet-install.sh
+          chmod +x ./dotnet-install.sh
+          sudo ./dotnet-install.sh --version "10.0.100" --install-dir "/opt/dotnet"
+          echo "/opt/dotnet" >> "$GITHUB_PATH"
+
 
       - name: Prepare pyrenode
         run: |
-          mono --version
-          wget -O $PYRENODE_PKG --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
+          dotnet --version
+          wget -q https://builds.renode.io/renode-latest.linux-dotnet.tar.gz -O renode-dotnet.tar.gz
           python3 -m pip install .
           python3 -m pip install -r examples/requirements.txt
 
       - name: Run examples
         run: |
+          export PYRENODE_RUNTIME="coreclr"
+          export PYRENODE_PKG="$PWD/renode-dotnet.tar.gz"
           for i in examples/*.py; do echo "Running test $i..."; python3 $i; done
