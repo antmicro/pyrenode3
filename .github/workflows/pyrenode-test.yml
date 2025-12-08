@@ -34,4 +34,4 @@ jobs:
         run: |
           export PYRENODE_RUNTIME="coreclr"
           export PYRENODE_PKG="$PWD/renode-dotnet.tar.gz"
-          for i in examples/*.py; do echo "Running test $i..."; python3 $i; done
+          for i in examples/*.py; do echo "Running test $i..."; timeout 240 python3 $i; done
