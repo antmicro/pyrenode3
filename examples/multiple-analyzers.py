@@ -11,8 +11,8 @@ from pyrenode3.inits import XwtInit
 
 from Antmicro.Renode.Peripherals.UART import IUART
 
-dts_url = "https://new-zephyr-dashboard.renode.io/zephyr/7f83db489e60f1ab93da01bccd744e4972c843e9/arduino_nicla_sense_me/hello_world/hello_world.dts"
-elf_url = "https://new-zephyr-dashboard.renode.io/zephyr/7f83db489e60f1ab93da01bccd744e4972c843e9/arduino_nicla_sense_me/hello_world/hello_world.elf"
+dts_url = "https://zephyr-dashboard.renode.io/zephyr/d14a547d4259a541c9baafb4bef6d4e2566f42b7/arduino_nicla_sense_me/hello_world/hello_world.dts"
+elf_url = "https://zephyr-dashboard.renode.io/zephyr/d14a547d4259a541c9baafb4bef6d4e2566f42b7/arduino_nicla_sense_me/hello_world/hello_world.elf"
 
 session = requests.Session()
 
