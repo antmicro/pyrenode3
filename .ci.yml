@@ -82,8 +82,8 @@ test-dotnet-portable:
   script:
     - *init_python
     # Download Renode pkg
-    - wget --progress=dot:giga https://builds.renode.io/renode-latest.linux-portable-dotnet.tar.gz
-    - tar xvf renode-latest.linux-portable-dotnet.tar.gz
+    - wget --progress=dot:giga https://builds.renode.io/renode-latest.linux-portable.tar.gz
+    - tar xvf renode-latest.linux-portable.tar.gz
     - export PYRENODE_RUNTIME=coreclr
     - export PYRENODE_BIN=$(realpath $PWD/renode_*-portable/renode)
     - *run_tests
@@ -97,7 +97,7 @@ test-dotnet-portable:
     - *install_dependencies
   script:
     - *init_python
-    - curl -s https://builds.renode.io/renode-latest.linux-dotnet.tar.gz -o renode-dotnet.tar.gz
+    - curl -s https://builds.renode.io/renode-latest.linux.tar.gz -o renode-dotnet.tar.gz
     - export PYRENODE_RUNTIME=coreclr
     - export PYRENODE_PKG=$PWD/renode-dotnet.tar.gz
     - *run_tests

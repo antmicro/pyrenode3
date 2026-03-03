@@ -26,7 +26,7 @@ jobs:
       - name: Prepare pyrenode
         run: |
           dotnet --version
-          wget -q https://builds.renode.io/renode-latest.linux-dotnet.tar.gz -O renode-dotnet.tar.gz
+          wget -q https://builds.renode.io/renode-latest.linux.tar.gz -O renode-dotnet.tar.gz
           python3 -m pip install .
           python3 -m pip install -r examples/requirements.txt
 
