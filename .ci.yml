@@ -37,8 +37,9 @@ test-mono-pkg:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: gtk-sharp2 mono-complete
-  script:
+  before_get_sources:
     - *install_dependencies
+  script:
     - *init_python
     # Download Renode pkg
     - wget --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
@@ -51,6 +52,8 @@ test-installed-pkg:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: gtk-sharp2 mono-complete
+  before_get_sources:
+    - *install_dependencies
   script:
     - *install_dependencies
     - *init_python
@@ -64,7 +67,7 @@ test-installed-pkg:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: cmake
-  before_script:
+  before_get_sources:
     - *install_dependencies
     - DOTNET_VERSION="$CI_PARALLEL_NAME"
     - *install_dotnet
@@ -85,8 +88,9 @@ test-dotnet-build:
 test-dotnet-portable:
   stage: build
   tags: ['ace-x86_64']
-  script:
+  before_get_sources:
     - *install_dependencies
+  script:
     - *init_python
     # Download Renode pkg
     - wget --progress=dot:giga https://builds.renode.io/renode-latest.linux-portable-dotnet.tar.gz
@@ -99,7 +103,7 @@ test-dotnet-portable:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: curl jq zip
-  before_script:
+  before_get_sources:
     - *install_dependencies
     - DOTNET_VERSION="$CI_PARALLEL_NAME"
     - *install_dotnet
@@ -120,8 +124,9 @@ test-mono-build:
   tags: ['ace-x86_64']
   variables:
     JOB_DEPS: cmake gtk-sharp2 mono-complete
-  script:
+  before_get_sources:
     - *install_dependencies
+  script:
     - *init_python
     # Build Renode
     - git clone https://github.com/antmicro/renode.git
