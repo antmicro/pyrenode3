@@ -242,7 +242,7 @@ class RenodeLoader(metaclass=MetaSingleton):
     @classmethod
     def from_net_bin(cls, path: "Union[str, pathlib.Path]"):
         """Load Renode from binary."""
-        renode_bin = pathlib.Path(path)
+        renode_bin = pathlib.Path(path).resolve()
         renode_dir = renode_bin.parent
 
         # As a side effect, executing the binary causes the embedded dlls to be extracted to:
