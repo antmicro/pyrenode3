@@ -27,7 +27,9 @@ class InitializationError(Exception):
 def ensure_symlink(src, dst, relative=False, verbose=False):
     linktype = "symlink"
     try:
-        dst.symlink_to(src if not relative else os.path.relpath(src, dst.parent))
+        target = src.absolute() if not relative else src
+
+        dst.symlink_to(target)
     except FileExistsError:
         return
     except OSError:
