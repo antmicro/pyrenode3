@@ -28,6 +28,9 @@ def ensure_symlink(src, dst, relative=False, verbose=False):
     linktype = "symlink"
     try:
         target = src.absolute() if not relative else src
+        # Remove the existing destination if it's a symlink to somewhere wrong
+        if dst.resolve().absolute() not in (dst.absolute(), target):
+            dst.unlink()
 
         dst.symlink_to(target)
     except FileExistsError:
