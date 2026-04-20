@@ -19,7 +19,7 @@ session = requests.Session()
 def download(url, dest):
     rsp = session.get(url)
     if rsp.status_code != requests.codes.OK:
-        exit(1)
+        raise Exception(f"Failed to download {url}: {rsp.status_code}", file=stderr)
 
     with open(dest, 'wb') as f:
         f.write(rsp.content)
@@ -27,7 +27,7 @@ def download(url, dest):
 def create_repl(dts, dest):
     repl = dts2repl.generate(dts)
     if repl == "":
-        exit(1)
+        raise Exception(f"Failed to generate repl for {dts}")
 
     with open(dest, "w") as f:
         f.write(repl)
