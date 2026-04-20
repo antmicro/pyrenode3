@@ -86,7 +86,7 @@ def ensure_additional_libs(renode_bin_dir):
     if platform.system() == "Windows":
         return []
     # HACK: move libMonoPosixHelper to path where it is searched for
-    bindll_dir = renode_bin_dir / "runtimes" / get_RID()
+    bindll_dir = pathlib.Path("runtimes") / get_RID()
     # Updating to Mono.Posix changed the name of this file
     # so we check for the new one, and fall back on the old one if it is not found
     lib_new = "libMono.Unix" + get_library_ext()
@@ -94,11 +94,11 @@ def ensure_additional_libs(renode_bin_dir):
     src_new = bindll_dir / "native" / lib_new
     src_old = bindll_dir / "native" / lib_old
 
-    if src_new.exists():
-        ensure_symlink(src_new, renode_bin_dir / lib_new, verbose=True)
+    if (renode_bin_dir / src_new).exists():
+        ensure_symlink(src_new, renode_bin_dir / lib_new, relative=True, verbose=True)
         return [renode_bin_dir / "Mono.Posix.dll"]
     else:
-        netstd_dir = bindll_dir / "lib/netstandard2.0"
+        netstd_dir = renode_bin_dir / bindll_dir / "lib/netstandard2.0"
         ensure_symlink(src_old, netstd_dir / lib_old, relative=True, verbose=True)
         return [netstd_dir / "Mono.Posix.NETStandard.dll"]
 
