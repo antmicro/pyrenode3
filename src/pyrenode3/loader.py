@@ -302,12 +302,18 @@ class RenodeLoader(metaclass=MetaSingleton):
         #  }}}}}
         SYSTEM_RUNTIME = "runtimepack.Microsoft.NETCore.App.Runtime." + get_RID()
         LIB_EXT = get_library_ext()
+        native_libs_to_load = list(renode_dir.glob("*" + LIB_EXT))
+        deps_file = binaries / "Renode.deps.json"
 
-        deps = json.load(open(binaries / "Renode.deps.json", "rb"))
+        with open(deps_file, "rb") as deps_fp:
+            deps = json.load(deps_fp)
+
         target = deps["targets"][deps["runtimeTarget"]["name"]]
         for lib, dlls in target.items():
             name, version = lib.split("/")
             if name == SYSTEM_RUNTIME:
+                # Patch in the libraries into deps.json so that they can be easily found, otherwise libhostfxr.so doesn't find them in newer versions of the runtime
+                dlls["native"] = {lib.name: {} for lib in native_libs_to_load}
                 tfm_full = version
                 system_dlls = list(dlls["runtime"])
                 break
@@ -317,9 +323,12 @@ class RenodeLoader(metaclass=MetaSingleton):
             logging.warning(f"Could not find {SYSTEM_RUNTIME} in deps.json. "
                             f"Assuming framework version {tfm_full}.")
 
+        with open(deps_file, "w") as deps_fp:
+            json.dump(deps, deps_fp)
+
         runtime = binaries / "shared/Microsoft.NETCore.App" / tfm_full
         runtime.mkdir(parents=True, exist_ok=True)
-        for lib in renode_dir.glob("*" + LIB_EXT):
+        for lib in native_libs_to_load:
             ensure_symlink(lib, runtime / lib.name)
 
         for lib in system_dlls:
