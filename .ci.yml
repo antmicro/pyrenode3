@@ -35,9 +35,9 @@ test-mono-pkg:
   script:
     - *init_python
     # Download Renode pkg
-    - wget --progress=dot:giga https://builds.renode.io/renode-latest.pkg.tar.xz
+    - wget --progress=dot:giga https://builds.renode.io/renode-latest.mono.pkg.tar.xz
     - export PYRENODE_RUNTIME=mono
-    - export PYRENODE_PKG=$PWD/renode-latest.pkg.tar.xz
+    - export PYRENODE_PKG=$PWD/renode-latest.mono.pkg.tar.xz
     - *run_tests
 
 test-installed-pkg:
@@ -48,11 +48,10 @@ test-installed-pkg:
   before_get_sources:
     - *install_dependencies
   script:
-    - *install_dependencies
     - *init_python
     # Download and install Renode
-    - wget --progress=dot:giga https://builds.renode.io/renode-latest.deb
-    - apt-get -y install ./renode-latest.deb
+    - wget --progress=dot:giga https://builds.renode.io/renode-latest.mono.deb
+    - apt-get -y install ./renode-latest.mono.deb
     - *run_tests
 
 .test-dotnet-build:
