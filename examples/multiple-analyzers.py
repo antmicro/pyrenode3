@@ -11,8 +11,7 @@ from pyrenode3.inits import XwtInit
 
 from Antmicro.Renode.Peripherals.UART import IUART
 
-dts_url = "https://zephyr-dashboard.renode.io/zephyr/d14a547d4259a541c9baafb4bef6d4e2566f42b7/arduino_nicla_sense_me/hello_world/hello_world.dts"
-elf_url = "https://zephyr-dashboard.renode.io/zephyr/d14a547d4259a541c9baafb4bef6d4e2566f42b7/arduino_nicla_sense_me/hello_world/hello_world.elf"
+elf_url = "https://dl.antmicro.com/projects/renode/zephyr-arduino_nicla_sense_me-hello_world.elf-s_661380-a6d7b8c3661b01c93cf0fd276e0e18e75d3a89d4"
 
 session = requests.Session()
 
@@ -56,9 +55,8 @@ def setup_machine(machine_name):
         for uart, uart_name in all_uarts:
             uart.CharReceived += create_callback(uart, f"{machine_name}_{uart_name}")
 
-download(dts_url, "example.dts")
 download(elf_url, "example.elf")
-create_repl("example.dts", "example.repl")
+create_repl(Path(__file__).parent / "multiple-analyzers.dts", "example.repl")
 
 emu = Emulation()
 

@@ -1,0 +1,817 @@
+/dts-v1/;
+
+/* node '/' defined in zephyr/dts/common/skeleton.dtsi:9 */
+/ {
+	#address-cells = < 0x1 >;                      /* in zephyr/dts/common/skeleton.dtsi:10 */
+	#size-cells = < 0x1 >;                         /* in zephyr/dts/common/skeleton.dtsi:11 */
+	model = "Arduino Nicla Sense ME";              /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:14 */
+	compatible = "arduino,arduino_nicla_sense_me"; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:15 */
+
+	/* node '/chosen' defined in zephyr/dts/common/skeleton.dtsi:13 */
+	chosen {
+		zephyr,bt-hci = &bt_hci_controller;          /* in zephyr/dts/arm/nordic/nrf52832.dtsi:10 */
+		zephyr,entropy = &rng;                       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:11 */
+		zephyr,flash-controller = &flash_controller; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:12 */
+		zephyr,console = &uart0;                     /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:29 */
+		zephyr,shell-uart = &uart0;                  /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:30 */
+		zephyr,uart-mcumgr = &uart0;                 /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:31 */
+		zephyr,bt-mon-uart = &uart0;                 /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:32 */
+		zephyr,bt-c2h-uart = &uart0;                 /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:33 */
+		zephyr,sram = &sram0;                        /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:34 */
+		zephyr,flash = &flash0;                      /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:35 */
+		zephyr,code-partition = &slot0_partition;    /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:36 */
+	};
+
+	/* node '/aliases' defined in zephyr/dts/common/skeleton.dtsi:15 */
+	aliases {
+		sw0 = &user_button; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:40 */
+		watchdog0 = &wdt0;  /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:41 */
+	};
+
+	/* node '/soc' defined in zephyr/dts/arm/armv7-m.dtsi:6 */
+	soc {
+		#address-cells = < 0x1 >;     /* in zephyr/dts/arm/armv7-m.dtsi:7 */
+		#size-cells = < 0x1 >;        /* in zephyr/dts/arm/armv7-m.dtsi:8 */
+		interrupt-parent = < &nvic >; /* in zephyr/dts/arm/armv7-m.dtsi:10 */
+		ranges;                       /* in zephyr/dts/arm/armv7-m.dtsi:11 */
+		compatible = "simple-bus";    /* in zephyr/dts/arm/nordic/nrf52832_qfaa.dtsi:21 */
+
+		/* node '/soc/interrupt-controller@e000e100' defined in zephyr/dts/arm/armv7-m.dtsi:13 */
+		nvic: interrupt-controller@e000e100 {
+			#address-cells = < 0x1 >;            /* in zephyr/dts/arm/armv7-m.dtsi:14 */
+			compatible = "arm,v7m-nvic";         /* in zephyr/dts/arm/armv7-m.dtsi:15 */
+			reg = < 0xe000e100 0xc00 >;          /* in zephyr/dts/arm/armv7-m.dtsi:16 */
+			interrupt-controller;                /* in zephyr/dts/arm/armv7-m.dtsi:17 */
+			#interrupt-cells = < 0x2 >;          /* in zephyr/dts/arm/armv7-m.dtsi:18 */
+			arm,num-irq-priority-bits = < 0x3 >; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:502 */
+			phandle = < 0x1 >;                   /* in zephyr/dts/arm/armv7-m.dtsi:10 */
+		};
+
+		/* node '/soc/timer@e000e010' defined in zephyr/dts/arm/armv7-m.dtsi:21 */
+		systick: timer@e000e010 {
+			compatible = "arm,armv7m-systick"; /* in zephyr/dts/arm/armv7-m.dtsi:22 */
+			reg = < 0xe000e010 0x10 >;         /* in zephyr/dts/arm/armv7-m.dtsi:23 */
+			status = "disabled";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:507 */
+		};
+
+		/* node '/soc/ficr@10000000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:44 */
+		ficr: ficr@10000000 {
+			compatible = "nordic,nrf-ficr"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:45 */
+			reg = < 0x10000000 0x1000 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:46 */
+			#nordic,ficr-cells = < 0x1 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:47 */
+			status = "okay";                /* in zephyr/dts/arm/nordic/nrf52832.dtsi:48 */
+		};
+
+		/* node '/soc/uicr@10001000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:51 */
+		uicr: uicr@10001000 {
+			compatible = "nordic,nrf-uicr"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:52 */
+			reg = < 0x10001000 0x1000 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:53 */
+			status = "okay";                /* in zephyr/dts/arm/nordic/nrf52832.dtsi:54 */
+			gpio-as-nreset;                 /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:50 */
+		};
+
+		/* node '/soc/memory@20000000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:57 */
+		sram0: memory@20000000 {
+			compatible = "mmio-sram";            /* in zephyr/dts/arm/nordic/nrf52832.dtsi:58 */
+			#address-cells = < 0x1 >;            /* in zephyr/dts/arm/nordic/nrf52832.dtsi:59 */
+			#size-cells = < 0x1 >;               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:60 */
+			reg = < 0x20000000 0x10000 >;        /* in zephyr/dts/arm/nordic/nrf52832_qfaa.dtsi:15 */
+			ranges = < 0x0 0x20000000 0x10000 >; /* in zephyr/dts/arm/nordic/nrf52832_qfaa.dtsi:16 */
+		};
+
+		/* node '/soc/clock@40000000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:63 */
+		clock: clock@40000000 {
+			compatible = "nordic,nrf-clock"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:64 */
+			reg = < 0x40000000 0x1000 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:65 */
+			interrupts = < 0x0 0x1 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:66 */
+			status = "okay";                 /* in zephyr/dts/arm/nordic/nrf52832.dtsi:67 */
+		};
+
+		/* node '/soc/power@40000000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:70 */
+		power: power@40000000 {
+			compatible = "nordic,nrf-power"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:71 */
+			reg = < 0x40000000 0x1000 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:72 */
+			interrupts = < 0x0 0x1 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:73 */
+			status = "okay";                 /* in zephyr/dts/arm/nordic/nrf52832.dtsi:74 */
+			#address-cells = < 0x1 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:75 */
+			#size-cells = < 0x1 >;           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:76 */
+
+			/* node '/soc/power@40000000/gpregret1@4000051c' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:78 */
+			gpregret1: gpregret1@4000051c {
+				#address-cells = < 0x1 >;           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:79 */
+				#size-cells = < 0x1 >;              /* in zephyr/dts/arm/nordic/nrf52832.dtsi:80 */
+				compatible = "nordic,nrf-gpregret"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:81 */
+				reg = < 0x4000051c 0x1 >;           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:82 */
+				status = "okay";                    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:83 */
+			};
+
+			/* node '/soc/power@40000000/gpregret2@40000520' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:86 */
+			gpregret2: gpregret2@40000520 {
+				#address-cells = < 0x1 >;           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:87 */
+				#size-cells = < 0x1 >;              /* in zephyr/dts/arm/nordic/nrf52832.dtsi:88 */
+				compatible = "nordic,nrf-gpregret"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:89 */
+				reg = < 0x40000520 0x1 >;           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:90 */
+				status = "okay";                    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:91 */
+			};
+
+			/* node '/soc/power@40000000/regulator@40000578' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:94 */
+			reg: regulator@40000578 {
+				compatible = "nordic,nrf5x-regulator"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:95 */
+				reg = < 0x40000578 0x1 >;              /* in zephyr/dts/arm/nordic/nrf52832.dtsi:96 */
+				regulator-name = "REG";                /* in zephyr/dts/arm/nordic/nrf52832.dtsi:97 */
+				regulator-initial-mode = < 0x0 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:98 */
+			};
+		};
+
+		/* node '/soc/bprot@40000000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:102 */
+		bprot: bprot@40000000 {
+			compatible = "nordic,nrf-bprot"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:103 */
+			reg = < 0x40000000 0x1000 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:104 */
+			status = "okay";                 /* in zephyr/dts/arm/nordic/nrf52832.dtsi:105 */
+		};
+
+		/* node '/soc/radio@40001000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:108 */
+		radio: radio@40001000 {
+			compatible = "nordic,nrf-radio"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:109 */
+			reg = < 0x40001000 0x1000 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:110 */
+			interrupts = < 0x1 0x1 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:111 */
+			status = "okay";                 /* in zephyr/dts/arm/nordic/nrf52832.dtsi:112 */
+			ble-2mbps-supported;             /* in zephyr/dts/arm/nordic/nrf52832.dtsi:113 */
+
+			/* node '/soc/radio@40001000/bt_hci_controller' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:118 */
+			bt_hci_controller: bt_hci_controller {
+				compatible = "zephyr,bt-hci-ll-sw-split"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:119 */
+				status = "okay";                          /* in zephyr/dts/arm/nordic/nrf52832.dtsi:120 */
+			};
+		};
+
+		/* node '/soc/uart@40002000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:124 */
+		uart0: uart@40002000 {
+			reg = < 0x40002000 0x1000 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:128 */
+			interrupts = < 0x2 0x1 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:129 */
+			compatible = "nordic,nrf-uarte"; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:62 */
+			status = "okay";                 /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:63 */
+			current-speed = < 0x1c200 >;     /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:64 */
+			pinctrl-0 = < &uart0_default >;  /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:65 */
+			pinctrl-1 = < &uart0_sleep >;    /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:66 */
+			pinctrl-names = "default",
+			                "sleep";         /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:67 */
+		};
+
+		/* node '/soc/i2c@40003000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:133 */
+		i2c0: i2c@40003000 {
+			#address-cells = < 0x1 >;       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:142 */
+			#size-cells = < 0x0 >;          /* in zephyr/dts/arm/nordic/nrf52832.dtsi:143 */
+			reg = < 0x40003000 0x1000 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:144 */
+			interrupts = < 0x3 0x1 >;       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:145 */
+			easydma-maxcnt-bits = < 0x8 >;  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:146 */
+			zephyr,pm-device-runtime-auto;  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:148 */
+			compatible = "nordic,nrf-twim"; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:72 */
+			status = "okay";                /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:73 */
+			pinctrl-0 = < &i2c0_default >;  /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:74 */
+			pinctrl-1 = < &i2c0_sleep >;    /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:75 */
+			pinctrl-names = "default",
+			                "sleep";        /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:76 */
+
+			/* node '/soc/i2c@40003000/is31fl3194@53' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:78 */
+			is31fl3194@53 {
+				compatible = "issi,is31fl3194"; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:79 */
+				reg = < 0x53 >;                 /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:80 */
+
+				/* node '/soc/i2c@40003000/is31fl3194@53/led_rgb' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:82 */
+				led_rgb {
+					label = "RGB LED";       /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:83 */
+					color-mapping = < 0x3 >,
+					                < 0x2 >,
+					                < 0x1 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:84 */
+					current-limit = < 0xa >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:87 */
+				};
+			};
+		};
+
+		/* node '/soc/spi@40003000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:151 */
+		spi0: spi@40003000 {
+			compatible = "nordic,nrf-spi"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:159 */
+			#address-cells = < 0x1 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:160 */
+			#size-cells = < 0x0 >;         /* in zephyr/dts/arm/nordic/nrf52832.dtsi:161 */
+			reg = < 0x40003000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:162 */
+			interrupts = < 0x3 0x1 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:163 */
+			max-frequency = < 0x7a1200 >;  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:164 */
+			easydma-maxcnt-bits = < 0x8 >; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:165 */
+			status = "disabled";           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:166 */
+		};
+
+		/* node '/soc/i2c@40004000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:169 */
+		i2c1: zephyr_i2c: i2c@40004000 {
+			#address-cells = < 0x1 >;       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:178 */
+			#size-cells = < 0x0 >;          /* in zephyr/dts/arm/nordic/nrf52832.dtsi:179 */
+			reg = < 0x40004000 0x1000 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:180 */
+			interrupts = < 0x4 0x1 >;       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:181 */
+			easydma-maxcnt-bits = < 0x8 >;  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:182 */
+			zephyr,pm-device-runtime-auto;  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:184 */
+			compatible = "nordic,nrf-twim"; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:94 */
+			status = "okay";                /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:96 */
+			pinctrl-0 = < &i2c1_default >;  /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:97 */
+			pinctrl-1 = < &i2c1_sleep >;    /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:98 */
+			pinctrl-names = "default",
+			                "sleep";        /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:99 */
+		};
+
+		/* node '/soc/spi@40004000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:187 */
+		spi1: spi@40004000 {
+			#address-cells = < 0x1 >;       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:196 */
+			#size-cells = < 0x0 >;          /* in zephyr/dts/arm/nordic/nrf52832.dtsi:197 */
+			reg = < 0x40004000 0x1000 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:198 */
+			interrupts = < 0x4 0x1 >;       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:199 */
+			max-frequency = < 0x7a1200 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:200 */
+			easydma-maxcnt-bits = < 0x8 >;  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:201 */
+			status = "disabled";            /* in zephyr/dts/arm/nordic/nrf52832.dtsi:202 */
+			compatible = "nordic,nrf-spim"; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:104 */
+			pinctrl-0 = < &spi1_default >;  /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:107 */
+			pinctrl-1 = < &spi1_sleep >;    /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:108 */
+			pinctrl-names = "default",
+			                "sleep";        /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:109 */
+		};
+
+		/* node '/soc/nfct@40005000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:205 */
+		nfct: nfct@40005000 {
+			compatible = "nordic,nrf-nfct"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:206 */
+			reg = < 0x40005000 0x1000 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:207 */
+			interrupts = < 0x5 0x1 >;       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:208 */
+			status = "disabled";            /* in zephyr/dts/arm/nordic/nrf52832.dtsi:209 */
+		};
+
+		/* node '/soc/gpiote@40006000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:212 */
+		gpiote: gpiote0: gpiote@40006000 {
+			compatible = "nordic,nrf-gpiote"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:213 */
+			reg = < 0x40006000 0x1000 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:214 */
+			interrupts = < 0x6 0x5 >;         /* in zephyr/dts/arm/nordic/nrf52832.dtsi:215 */
+			instance = < 0x0 >;               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:217 */
+			status = "okay";                  /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:54 */
+			phandle = < 0xd >;                /* in zephyr/dts/arm/nordic/nrf52832.dtsi:496 */
+		};
+
+		/* node '/soc/adc@40007000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:220 */
+		adc: adc@40007000 {
+			compatible = "nordic,nrf-saadc"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:221 */
+			reg = < 0x40007000 0x1000 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:222 */
+			interrupts = < 0x7 0x1 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:223 */
+			#io-channel-cells = < 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:225 */
+			zephyr,pm-device-runtime-auto;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:226 */
+			status = "okay";                 /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:46 */
+		};
+
+		/* node '/soc/timer@40008000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:229 */
+		timer0: timer@40008000 {
+			compatible = "nordic,nrf-timer"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:230 */
+			status = "disabled";             /* in zephyr/dts/arm/nordic/nrf52832.dtsi:231 */
+			reg = < 0x40008000 0x1000 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:232 */
+			cc-num = < 0x4 >;                /* in zephyr/dts/arm/nordic/nrf52832.dtsi:233 */
+			max-bit-width = < 0x20 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:234 */
+			interrupts = < 0x8 0x1 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:235 */
+			prescaler = < 0x0 >;             /* in zephyr/dts/arm/nordic/nrf52832.dtsi:236 */
+		};
+
+		/* node '/soc/timer@40009000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:239 */
+		timer1: timer@40009000 {
+			compatible = "nordic,nrf-timer"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:240 */
+			status = "disabled";             /* in zephyr/dts/arm/nordic/nrf52832.dtsi:241 */
+			reg = < 0x40009000 0x1000 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:242 */
+			cc-num = < 0x4 >;                /* in zephyr/dts/arm/nordic/nrf52832.dtsi:243 */
+			max-bit-width = < 0x20 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:244 */
+			interrupts = < 0x9 0x1 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:245 */
+			prescaler = < 0x0 >;             /* in zephyr/dts/arm/nordic/nrf52832.dtsi:246 */
+			phandle = < 0xe >;               /* in zephyr/dts/vendor/nordic/nrf_common.dtsi:42 */
+		};
+
+		/* node '/soc/timer@4000a000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:249 */
+		timer2: timer@4000a000 {
+			compatible = "nordic,nrf-timer"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:250 */
+			status = "disabled";             /* in zephyr/dts/arm/nordic/nrf52832.dtsi:251 */
+			reg = < 0x4000a000 0x1000 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:252 */
+			cc-num = < 0x4 >;                /* in zephyr/dts/arm/nordic/nrf52832.dtsi:253 */
+			max-bit-width = < 0x20 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:254 */
+			interrupts = < 0xa 0x1 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:255 */
+			prescaler = < 0x0 >;             /* in zephyr/dts/arm/nordic/nrf52832.dtsi:256 */
+		};
+
+		/* node '/soc/rtc@4000b000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:259 */
+		rtc0: rtc@4000b000 {
+			compatible = "nordic,nrf-rtc"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:260 */
+			reg = < 0x4000b000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:261 */
+			cc-num = < 0x3 >;              /* in zephyr/dts/arm/nordic/nrf52832.dtsi:262 */
+			interrupts = < 0xb 0x1 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:263 */
+			status = "disabled";           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:264 */
+			clock-frequency = < 0x8000 >;  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:265 */
+			prescaler = < 0x1 >;           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:266 */
+		};
+
+		/* node '/soc/temp@4000c000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:269 */
+		temp: temp@4000c000 {
+			compatible = "nordic,nrf-temp"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:270 */
+			reg = < 0x4000c000 0x1000 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:271 */
+			interrupts = < 0xc 0x1 >;       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:272 */
+			status = "okay";                /* in zephyr/dts/arm/nordic/nrf52832.dtsi:273 */
+		};
+
+		/* node '/soc/random@4000d000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:276 */
+		rng: random@4000d000 {
+			compatible = "nordic,nrf-rng"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:277 */
+			reg = < 0x4000d000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:278 */
+			interrupts = < 0xd 0x1 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:279 */
+			status = "okay";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:280 */
+		};
+
+		/* node '/soc/ecb@4000e000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:283 */
+		ecb: ecb@4000e000 {
+			compatible = "nordic,nrf-ecb"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:284 */
+			reg = < 0x4000e000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:285 */
+			interrupts = < 0xe 0x1 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:286 */
+			status = "okay";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:287 */
+		};
+
+		/* node '/soc/ccm@4000f000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:290 */
+		ccm: ccm@4000f000 {
+			compatible = "nordic,nrf-ccm"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:291 */
+			reg = < 0x4000f000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:292 */
+			interrupts = < 0xf 0x1 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:293 */
+			length-field-length-8-bits;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:294 */
+			status = "okay";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:295 */
+		};
+
+		/* node '/soc/watchdog@40010000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:298 */
+		wdt: wdt0: watchdog@40010000 {
+			compatible = "nordic,nrf-wdt"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:299 */
+			reg = < 0x40010000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:300 */
+			interrupts = < 0x10 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:301 */
+			status = "okay";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:302 */
+		};
+
+		/* node '/soc/rtc@40011000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:305 */
+		rtc1: rtc@40011000 {
+			compatible = "nordic,nrf-rtc"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:306 */
+			reg = < 0x40011000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:307 */
+			cc-num = < 0x4 >;              /* in zephyr/dts/arm/nordic/nrf52832.dtsi:308 */
+			interrupts = < 0x11 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:309 */
+			status = "disabled";           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:310 */
+			clock-frequency = < 0x8000 >;  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:311 */
+			prescaler = < 0x1 >;           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:312 */
+		};
+
+		/* node '/soc/qdec@40012000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:315 */
+		qdec: qdec0: qdec@40012000 {
+			compatible = "nordic,nrf-qdec"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:316 */
+			reg = < 0x40012000 0x1000 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:317 */
+			interrupts = < 0x12 0x1 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:318 */
+			status = "disabled";            /* in zephyr/dts/arm/nordic/nrf52832.dtsi:319 */
+		};
+
+		/* node '/soc/comparator@40013000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:322 */
+		comp: comparator@40013000 {
+			compatible = "nordic,nrf-comp"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:327 */
+			reg = < 0x40013000 0x1000 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:328 */
+			interrupts = < 0x13 0x1 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:329 */
+			status = "disabled";            /* in zephyr/dts/arm/nordic/nrf52832.dtsi:330 */
+		};
+
+		/* node '/soc/egu@40014000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:333 */
+		egu0: swi0: egu@40014000 {
+			compatible = "nordic,nrf-egu",
+			             "nordic,nrf-swi"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:334 */
+			reg = < 0x40014000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:335 */
+			interrupts = < 0x14 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:336 */
+			status = "okay";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:337 */
+		};
+
+		/* node '/soc/egu@40015000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:340 */
+		egu1: swi1: egu@40015000 {
+			compatible = "nordic,nrf-egu",
+			             "nordic,nrf-swi"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:341 */
+			reg = < 0x40015000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:342 */
+			interrupts = < 0x15 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:343 */
+			status = "okay";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:344 */
+		};
+
+		/* node '/soc/egu@40016000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:347 */
+		egu2: swi2: egu@40016000 {
+			compatible = "nordic,nrf-egu",
+			             "nordic,nrf-swi"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:348 */
+			reg = < 0x40016000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:349 */
+			interrupts = < 0x16 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:350 */
+			status = "okay";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:351 */
+		};
+
+		/* node '/soc/egu@40017000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:354 */
+		egu3: swi3: egu@40017000 {
+			compatible = "nordic,nrf-egu",
+			             "nordic,nrf-swi"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:355 */
+			reg = < 0x40017000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:356 */
+			interrupts = < 0x17 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:357 */
+			status = "okay";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:358 */
+		};
+
+		/* node '/soc/egu@40018000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:361 */
+		egu4: swi4: egu@40018000 {
+			compatible = "nordic,nrf-egu",
+			             "nordic,nrf-swi"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:362 */
+			reg = < 0x40018000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:363 */
+			interrupts = < 0x18 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:364 */
+			status = "okay";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:365 */
+		};
+
+		/* node '/soc/egu@40019000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:368 */
+		egu5: swi5: egu@40019000 {
+			compatible = "nordic,nrf-egu",
+			             "nordic,nrf-swi"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:369 */
+			reg = < 0x40019000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:370 */
+			interrupts = < 0x19 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:371 */
+			status = "okay";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:372 */
+		};
+
+		/* node '/soc/timer@4001a000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:375 */
+		timer3: timer@4001a000 {
+			compatible = "nordic,nrf-timer"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:376 */
+			status = "disabled";             /* in zephyr/dts/arm/nordic/nrf52832.dtsi:377 */
+			reg = < 0x4001a000 0x1000 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:378 */
+			cc-num = < 0x6 >;                /* in zephyr/dts/arm/nordic/nrf52832.dtsi:379 */
+			max-bit-width = < 0x20 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:380 */
+			interrupts = < 0x1a 0x1 >;       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:381 */
+			prescaler = < 0x0 >;             /* in zephyr/dts/arm/nordic/nrf52832.dtsi:382 */
+		};
+
+		/* node '/soc/timer@4001b000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:385 */
+		timer4: timer@4001b000 {
+			compatible = "nordic,nrf-timer"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:386 */
+			status = "disabled";             /* in zephyr/dts/arm/nordic/nrf52832.dtsi:387 */
+			reg = < 0x4001b000 0x1000 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:388 */
+			cc-num = < 0x6 >;                /* in zephyr/dts/arm/nordic/nrf52832.dtsi:389 */
+			max-bit-width = < 0x20 >;        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:390 */
+			interrupts = < 0x1b 0x1 >;       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:391 */
+			prescaler = < 0x0 >;             /* in zephyr/dts/arm/nordic/nrf52832.dtsi:392 */
+		};
+
+		/* node '/soc/pwm@4001c000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:395 */
+		pwm0: pwm@4001c000 {
+			compatible = "nordic,nrf-pwm"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:396 */
+			reg = < 0x4001c000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:397 */
+			interrupts = < 0x1c 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:398 */
+			status = "disabled";           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:399 */
+			#pwm-cells = < 0x3 >;          /* in zephyr/dts/arm/nordic/nrf52832.dtsi:400 */
+		};
+
+		/* node '/soc/pdm@4001d000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:403 */
+		pdm0: pdm@4001d000 {
+			compatible = "nordic,nrf-pdm"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:404 */
+			reg = < 0x4001d000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:405 */
+			interrupts = < 0x1d 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:406 */
+			status = "disabled";           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:407 */
+		};
+
+		/* node '/soc/flash-controller@4001e000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:410 */
+		flash_controller: flash-controller@4001e000 {
+			compatible = "nordic,nrf52-flash-controller"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:411 */
+			reg = < 0x4001e000 0x1000 >;                  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:412 */
+			#address-cells = < 0x1 >;                     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:414 */
+			#size-cells = < 0x1 >;                        /* in zephyr/dts/arm/nordic/nrf52832.dtsi:415 */
+
+			/* node '/soc/flash-controller@4001e000/flash@0' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:417 */
+			flash0: flash@0 {
+				compatible = "soc-nv-flash";   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:418 */
+				erase-block-size = < 0x1000 >; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:419 */
+				write-block-size = < 0x4 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:420 */
+				reg = < 0x0 0x80000 >;         /* in zephyr/dts/arm/nordic/nrf52832_qfaa.dtsi:11 */
+
+				/* node '/soc/flash-controller@4001e000/flash@0/partitions' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:145 */
+				partitions {
+					compatible = "fixed-partitions"; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:146 */
+					#address-cells = < 0x1 >;        /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:147 */
+					#size-cells = < 0x1 >;           /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:148 */
+
+					/* node '/soc/flash-controller@4001e000/flash@0/partitions/partition@0' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:150 */
+					boot_partition: partition@0 {
+						label = "sam-ba";      /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:151 */
+						reg = < 0x0 0x10000 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:152 */
+						read-only;             /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:153 */
+					};
+
+					/* node '/soc/flash-controller@4001e000/flash@0/partitions/partition@10000' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:156 */
+					slot0_partition: partition@10000 {
+						label = "image-0";         /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:157 */
+						reg = < 0x10000 0x30000 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:158 */
+					};
+
+					/* node '/soc/flash-controller@4001e000/flash@0/partitions/partition@40000' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:161 */
+					slot1_partition: partition@40000 {
+						label = "image-1";         /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:162 */
+						reg = < 0x40000 0x30000 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:163 */
+					};
+
+					/* node '/soc/flash-controller@4001e000/flash@0/partitions/partition@70000' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:166 */
+					scratch_partition: partition@70000 {
+						label = "image-scratch";  /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:167 */
+						reg = < 0x70000 0xa000 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:168 */
+					};
+
+					/* node '/soc/flash-controller@4001e000/flash@0/partitions/partition@7a000' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:171 */
+					storage_partition: partition@7a000 {
+						label = "storage";        /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:172 */
+						reg = < 0x7a000 0x6000 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:173 */
+					};
+				};
+			};
+		};
+
+		/* node '/soc/ppi@4001f000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:424 */
+		ppi: ppi@4001f000 {
+			compatible = "nordic,nrf-ppi"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:425 */
+			reg = < 0x4001f000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:426 */
+			status = "okay";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:427 */
+		};
+
+		/* node '/soc/mwu@40020000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:430 */
+		mwu: mwu@40020000 {
+			compatible = "nordic,nrf-mwu"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:431 */
+			reg = < 0x40020000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:432 */
+			status = "okay";               /* in zephyr/dts/arm/nordic/nrf52832.dtsi:433 */
+		};
+
+		/* node '/soc/pwm@40021000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:436 */
+		pwm1: pwm@40021000 {
+			compatible = "nordic,nrf-pwm"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:437 */
+			reg = < 0x40021000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:438 */
+			interrupts = < 0x21 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:439 */
+			status = "disabled";           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:440 */
+			#pwm-cells = < 0x3 >;          /* in zephyr/dts/arm/nordic/nrf52832.dtsi:441 */
+		};
+
+		/* node '/soc/pwm@40022000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:444 */
+		pwm2: pwm@40022000 {
+			compatible = "nordic,nrf-pwm"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:445 */
+			reg = < 0x40022000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:446 */
+			interrupts = < 0x22 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:447 */
+			status = "disabled";           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:448 */
+			#pwm-cells = < 0x3 >;          /* in zephyr/dts/arm/nordic/nrf52832.dtsi:449 */
+		};
+
+		/* node '/soc/spi@40023000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:452 */
+		spi2: spi@40023000 {
+			#address-cells = < 0x1 >;       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:461 */
+			#size-cells = < 0x0 >;          /* in zephyr/dts/arm/nordic/nrf52832.dtsi:462 */
+			reg = < 0x40023000 0x1000 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:463 */
+			interrupts = < 0x23 0x1 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:464 */
+			max-frequency = < 0x7a1200 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:465 */
+			easydma-maxcnt-bits = < 0x8 >;  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:466 */
+			compatible = "nordic,nrf-spi";  /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:114 */
+			status = "okay";                /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:115 */
+			pinctrl-0 = < &spi2_default >;  /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:116 */
+			pinctrl-1 = < &spi2_sleep >;    /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:117 */
+			pinctrl-names = "default",
+			                "sleep";        /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:118 */
+			cs-gpios = < &gpio0 0x1a 0x1 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:119 */
+
+			/* node '/soc/spi@40023000/mx25r1635f@0' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:121 */
+			mx25r1635f: mx25r1635f@0 {
+				compatible = "jedec,spi-nor";      /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:122 */
+				reg = < 0x0 >;                     /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:123 */
+				spi-max-frequency = < 0x4c4b400 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:124 */
+				jedec-id = [ C2 28 15 ];           /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:125 */
+				size = < 0x1000000 >;              /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:126 */
+				has-dpd;                           /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:127 */
+				t-enter-dpd = < 0x2710 >;          /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:128 */
+				t-exit-dpd = < 0x88b8 >;           /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:129 */
+
+				/* node '/soc/spi@40023000/mx25r1635f@0/partitions' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:131 */
+				partitions {
+					compatible = "fixed-partitions"; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:132 */
+					#address-cells = < 0x1 >;        /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:133 */
+					#size-cells = < 0x1 >;           /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:134 */
+
+					/* node '/soc/spi@40023000/mx25r1635f@0/partitions/partition@0' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:136 */
+					logging_partition: partition@0 {
+						label = "logging";       /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:137 */
+						reg = < 0x0 0x1000000 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:138 */
+					};
+				};
+			};
+		};
+
+		/* node '/soc/rtc@40024000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:470 */
+		rtc2: rtc@40024000 {
+			compatible = "nordic,nrf-rtc"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:471 */
+			reg = < 0x40024000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:472 */
+			cc-num = < 0x4 >;              /* in zephyr/dts/arm/nordic/nrf52832.dtsi:473 */
+			interrupts = < 0x24 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:474 */
+			status = "disabled";           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:475 */
+			clock-frequency = < 0x8000 >;  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:476 */
+			prescaler = < 0x1 >;           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:477 */
+		};
+
+		/* node '/soc/i2s@40025000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:480 */
+		i2s0: i2s@40025000 {
+			compatible = "nordic,nrf-i2s"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:481 */
+			#address-cells = < 0x1 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:482 */
+			#size-cells = < 0x0 >;         /* in zephyr/dts/arm/nordic/nrf52832.dtsi:483 */
+			reg = < 0x40025000 0x1000 >;   /* in zephyr/dts/arm/nordic/nrf52832.dtsi:484 */
+			interrupts = < 0x25 0x1 >;     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:485 */
+			status = "disabled";           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:486 */
+		};
+
+		/* node '/soc/gpio@50000000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:489 */
+		gpio0: gpio@50000000 {
+			compatible = "nordic,nrf-gpio"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:490 */
+			gpio-controller;                /* in zephyr/dts/arm/nordic/nrf52832.dtsi:491 */
+			reg = < 0x50000000 0x1000 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:492 */
+			#gpio-cells = < 0x2 >;          /* in zephyr/dts/arm/nordic/nrf52832.dtsi:493 */
+			port = < 0x0 >;                 /* in zephyr/dts/arm/nordic/nrf52832.dtsi:495 */
+			gpiote-instance = < &gpiote >;  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:496 */
+			status = "okay";                /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:58 */
+			phandle = < 0xc >;              /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:119 */
+		};
+	};
+
+	/* node '/pin-controller' defined in zephyr/dts/vendor/nordic/nrf_common.dtsi:26 */
+	pinctrl: pin-controller {
+		compatible = "nordic,nrf-pinctrl"; /* in zephyr/dts/vendor/nordic/nrf_common.dtsi:31 */
+
+		/* node '/pin-controller/uart0_default' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:8 */
+		uart0_default: uart0_default {
+			phandle = < 0x2 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:65 */
+
+			/* node '/pin-controller/uart0_default/group1' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:9 */
+			group1 {
+				psels = < 0x14 >,
+				        < 0x1000009 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:10 */
+			};
+		};
+
+		/* node '/pin-controller/uart0_sleep' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:15 */
+		uart0_sleep: uart0_sleep {
+			phandle = < 0x3 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:66 */
+
+			/* node '/pin-controller/uart0_sleep/group1' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:16 */
+			group1 {
+				psels = < 0x14 >,
+				        < 0x1000009 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:17 */
+				low-power-enable;      /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:19 */
+			};
+		};
+
+		/* node '/pin-controller/i2c0_default' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:23 */
+		i2c0_default: i2c0_default {
+			phandle = < 0x4 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:74 */
+
+			/* node '/pin-controller/i2c0_default/group1' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:24 */
+			group1 {
+				psels = < 0xc00000f >,
+				        < 0xb000010 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:25 */
+			};
+		};
+
+		/* node '/pin-controller/i2c0_sleep' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:30 */
+		i2c0_sleep: i2c0_sleep {
+			phandle = < 0x5 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:75 */
+
+			/* node '/pin-controller/i2c0_sleep/group1' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:31 */
+			group1 {
+				psels = < 0xc00000f >,
+				        < 0xb000010 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:32 */
+				low-power-enable;      /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:34 */
+			};
+		};
+
+		/* node '/pin-controller/i2c1_default' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:38 */
+		i2c1_default: i2c1_default {
+			phandle = < 0x6 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:97 */
+
+			/* node '/pin-controller/i2c1_default/group1' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:39 */
+			group1 {
+				psels = < 0xc000016 >,
+				        < 0xb000017 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:40 */
+			};
+		};
+
+		/* node '/pin-controller/i2c1_sleep' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:45 */
+		i2c1_sleep: i2c1_sleep {
+			phandle = < 0x7 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:98 */
+
+			/* node '/pin-controller/i2c1_sleep/group1' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:46 */
+			group1 {
+				psels = < 0xc000016 >,
+				        < 0xb000017 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:47 */
+				low-power-enable;      /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:49 */
+			};
+		};
+
+		/* node '/pin-controller/spi1_default' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:53 */
+		spi1_default: spi1_default {
+			phandle = < 0x8 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:107 */
+
+			/* node '/pin-controller/spi1_default/group1' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:54 */
+			group1 {
+				psels = < 0x400000b >,
+				        < 0x500001b >,
+				        < 0x600001c >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:55 */
+			};
+		};
+
+		/* node '/pin-controller/spi1_sleep' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:61 */
+		spi1_sleep: spi1_sleep {
+			phandle = < 0x9 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:108 */
+
+			/* node '/pin-controller/spi1_sleep/group1' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:62 */
+			group1 {
+				psels = < 0x400000b >,
+				        < 0x500001b >,
+				        < 0x600001c >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:63 */
+				low-power-enable;      /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:66 */
+			};
+		};
+
+		/* node '/pin-controller/spi2_default' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:70 */
+		spi2_default: spi2_default {
+			phandle = < 0xa >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:116 */
+
+			/* node '/pin-controller/spi2_default/group1' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:71 */
+			group1 {
+				psels = < 0x4000003 >,
+				        < 0x5000004 >,
+				        < 0x6000005 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:72 */
+			};
+		};
+
+		/* node '/pin-controller/spi2_sleep' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:78 */
+		spi2_sleep: spi2_sleep {
+			phandle = < 0xb >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:117 */
+
+			/* node '/pin-controller/spi2_sleep/group1' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:79 */
+			group1 {
+				psels = < 0x4000003 >,
+				        < 0x5000004 >,
+				        < 0x6000005 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:80 */
+				low-power-enable;      /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me-pinctrl.dtsi:83 */
+			};
+		};
+	};
+
+	/* node '/entropy_bt_hci' defined in zephyr/dts/vendor/nordic/nrf_common.dtsi:34 */
+	rng_hci: entropy_bt_hci {
+		compatible = "zephyr,bt-hci-entropy"; /* in zephyr/dts/vendor/nordic/nrf_common.dtsi:35 */
+		status = "disabled";                  /* in zephyr/dts/vendor/nordic/nrf_common.dtsi:36 */
+	};
+
+	/* node '/sw-pwm' defined in zephyr/dts/vendor/nordic/nrf_common.dtsi:39 */
+	sw_pwm: sw-pwm {
+		compatible = "nordic,nrf-sw-pwm"; /* in zephyr/dts/vendor/nordic/nrf_common.dtsi:40 */
+		status = "disabled";              /* in zephyr/dts/vendor/nordic/nrf_common.dtsi:41 */
+		generator = < &timer1 >;          /* in zephyr/dts/vendor/nordic/nrf_common.dtsi:42 */
+		clock-prescaler = < 0x0 >;        /* in zephyr/dts/vendor/nordic/nrf_common.dtsi:43 */
+		#pwm-cells = < 0x3 >;             /* in zephyr/dts/vendor/nordic/nrf_common.dtsi:44 */
+	};
+
+	/* node '/cpus' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:15 */
+	cpus {
+		#address-cells = < 0x1 >; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:16 */
+		#size-cells = < 0x0 >;    /* in zephyr/dts/arm/nordic/nrf52832.dtsi:17 */
+
+		/* node '/cpus/cpu@0' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:19 */
+		cpu@0 {
+			device_type = "cpu";           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:20 */
+			compatible = "arm,cortex-m4f"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:21 */
+			reg = < 0x0 >;                 /* in zephyr/dts/arm/nordic/nrf52832.dtsi:22 */
+			#address-cells = < 0x1 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:23 */
+			#size-cells = < 0x1 >;         /* in zephyr/dts/arm/nordic/nrf52832.dtsi:24 */
+
+			/* node '/cpus/cpu@0/itm@e0000000' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:26 */
+			itm: itm@e0000000 {
+				compatible = "arm,armv7m-itm";     /* in zephyr/dts/arm/nordic/nrf52832.dtsi:27 */
+				reg = < 0xe0000000 0x1000 >;       /* in zephyr/dts/arm/nordic/nrf52832.dtsi:28 */
+				swo-ref-frequency = < 0x1e84800 >; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:29 */
+			};
+		};
+	};
+
+	/* node '/clocks' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:34 */
+	clocks {
+
+		/* node '/clocks/hfxo' defined in zephyr/dts/arm/nordic/nrf52832.dtsi:35 */
+		hfxo: hfxo {
+			compatible = "nordic,nrf52-hfxo"; /* in zephyr/dts/arm/nordic/nrf52832.dtsi:36 */
+			clock-frequency = < 0x3d09000 >;  /* in zephyr/dts/arm/nordic/nrf52832.dtsi:37 */
+			startup-time-us = < 0x578 >;      /* in zephyr/dts/arm/nordic/nrf52832.dtsi:38 */
+			#clock-cells = < 0x0 >;           /* in zephyr/dts/arm/nordic/nrf52832.dtsi:39 */
+		};
+	};
+
+	/* node '/gpio_keys' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:17 */
+	gpio_keys {
+		compatible = "gpio-keys"; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:18 */
+
+		/* node '/gpio_keys/button' defined in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:20 */
+		user_button: button {
+			label = "user button";       /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:21 */
+			gpios = < &gpio0 0x15 0x1 >; /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:22 */
+			status = "okay";             /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:23 */
+			zephyr,code = < 0xb >;       /* in zephyr/boards/arduino/nicla_sense_me/arduino_nicla_sense_me.dts:24 */
+		};
+	};
+};
