@@ -5,19 +5,12 @@ variables:
 
 .install-dependencies: &install_dependencies |-
     apt-get -qqy update > /dev/null
-    apt-get -qqy install ${COMMON_DEPS} ${JOB_DEPS} > /dev/null
-
-.install-dotnet: &install_dotnet |-
-    echo "verbose = off" > wgetrc_local
-    export WGETRC=wgetrc_local
-    wget --progress=dot:giga https://dot.net/v1/dotnet-install.sh -O /dotnet-install.sh
-    chmod +x /dotnet-install.sh
-    /dotnet-install.sh --version "$DOTNET_VERSION" --install-dir "/opt/dotnet"
-
-.add-dotnet-path: &add_dotnet_path |-
-    export PATH="/opt/dotnet:$PATH"
-    dotnet --list-sdks
-    dotnet --list-runtimes
+    apt-get -qqy install ${COMMON_DEPS} > /dev/null
+    wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+    dpkg -i packages-microsoft-prod.deb
+    rm packages-microsoft-prod.deb
+    apt-get -qqy update > /dev/null
+    apt-get -qqy install ${JOB_DEPS} > /dev/null
 
 .init-python: &init_python |-
     python3 -m venv .venv && source .venv/bin/activate
@@ -28,9 +21,9 @@ variables:
   for i in examples/*.py; do echo "Running test $i..."; timeout 240 python3 $i; done
 
 .dotnet-sdk-versions: &dotnet_sdk_versions
-  - "8.0.416"
-  - "9.0.307"
-  - "10.0.100"
+  - "8.0"
+  - "9.0"
+  - "10.0"
 
 test-mono-pkg:
   stage: build
@@ -66,14 +59,11 @@ test-installed-pkg:
   stage: build
   tags: ['ace-x86_64']
   variables:
-    JOB_DEPS: cmake
+    JOB_DEPS: cmake dotnet-sdk-$CI_PARALLEL_NAME
   before_get_sources:
     - *install_dependencies
-    - DOTNET_VERSION="$CI_PARALLEL_NAME"
-    - *install_dotnet
   script:
     - *init_python
-    - *add_dotnet_path
     # Build Renode
     - git clone https://github.com/antmicro/renode.git
     - pushd renode && ./build.sh --net && popd
@@ -103,14 +93,11 @@ test-dotnet-portable:
   stage: build
   tags: ['ace-x86_64']
   variables:
-    JOB_DEPS: curl jq zip
+    JOB_DEPS: curl jq zip dotnet-runtime-$CI_PARALLEL_NAME
   before_get_sources:
     - *install_dependencies
-    - DOTNET_VERSION="$CI_PARALLEL_NAME"
-    - *install_dotnet
   script:
     - *init_python
-    - *add_dotnet_path
     - curl -s https://builds.renode.io/renode-latest.linux-dotnet.tar.gz -o renode-dotnet.tar.gz
     - export PYRENODE_RUNTIME=coreclr
     - export PYRENODE_PKG=$PWD/renode-dotnet.tar.gz
