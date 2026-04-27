@@ -1,7 +1,7 @@
 image: "d2s://external/docker/debian:bookworm"
 
 variables:
-  COMMON_DEPS: git autoconf automake coreutils g++ gcc libgtk2.0-0 libtool policykit-1 python3 python3 python3-pip python3-venv screen uml-utilities wget
+  COMMON_DEPS: git autoconf automake coreutils g++ gcc cmake libgtk2.0-0 libtool policykit-1 python3 python3 python3-pip python3-venv screen uml-utilities wget curl jq zip
 
 .install-dependencies: &install_dependencies |-
     apt-get -qqy update > /dev/null
@@ -10,7 +10,16 @@ variables:
     dpkg -i packages-microsoft-prod.deb
     rm packages-microsoft-prod.deb
     apt-get -qqy update > /dev/null
-    apt-get -qqy install ${JOB_DEPS} > /dev/null
+
+.install-mono: &install-mono |-
+    apt-get -qqy install gtk-sharp2 mono-complete > /dev/null
+
+# Due to multiple dotnet versions being used in this CI, install-dotnet cannot
+# be placed in before_get_sources because version variable will be exapnded
+# only after hash calculation which results in hash collions and therefore
+# overlay mixups between different dotnet jobs.
+.install-dotnet: &install-dotnet |-
+    apt-get -qqy install dotnet-sdk-$CI_PARALLEL_NAME > /dev/null
 
 .init-python: &init_python |-
     python3 -m venv .venv && source .venv/bin/activate
@@ -28,10 +37,10 @@ variables:
 test-mono-pkg:
   stage: build
   tags: ['ace-x86_64']
-  variables:
-    JOB_DEPS: gtk-sharp2 mono-complete
   before_get_sources:
     - *install_dependencies
+  before_script:
+    - *install-mono
   script:
     - *init_python
     # Download Renode pkg
@@ -43,10 +52,10 @@ test-mono-pkg:
 test-installed-pkg:
   stage: build
   tags: ['ace-x86_64']
-  variables:
-    JOB_DEPS: gtk-sharp2 mono-complete
   before_get_sources:
     - *install_dependencies
+  before_script:
+    - *install-mono
   script:
     - *init_python
     # Download and install Renode
@@ -57,10 +66,10 @@ test-installed-pkg:
 .test-dotnet-build:
   stage: build
   tags: ['ace-x86_64']
-  variables:
-    JOB_DEPS: cmake dotnet-sdk-$CI_PARALLEL_NAME
   before_get_sources:
     - *install_dependencies
+  before_script:
+    - *install-dotnet
   script:
     - *init_python
     # Build Renode
@@ -91,10 +100,10 @@ test-dotnet-portable:
 .test-dotnet-pkg:
   stage: build
   tags: ['ace-x86_64']
-  variables:
-    JOB_DEPS: curl jq zip dotnet-runtime-$CI_PARALLEL_NAME
   before_get_sources:
     - *install_dependencies
+  before_script:
+    - *install-dotnet
   script:
     - *init_python
     - curl -s https://builds.renode.io/renode-latest.linux.tar.gz -o renode-dotnet.tar.gz
@@ -109,10 +118,10 @@ test-dotnet-pkg:
 test-mono-build:
   stage: build
   tags: ['ace-x86_64']
-  variables:
-    JOB_DEPS: cmake gtk-sharp2 mono-complete
   before_get_sources:
     - *install_dependencies
+  before_script:
+    - *install-mono
   script:
     - *init_python
     # Build Renode
