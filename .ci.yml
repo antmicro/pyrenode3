@@ -49,7 +49,7 @@ test-mono-pkg:
     - export PYRENODE_PKG=$PWD/renode-latest.mono.pkg.tar.xz
     - *run_tests
 
-test-installed-pkg:
+test-installed-mono-pkg:
   stage: build
   tags: ['ace-x86_64']
   before_get_sources:
