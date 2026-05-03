@@ -1,6 +1,9 @@
 import atexit
 import time
 from threading import Thread
+import os
+if os.name == "nt"
+    import pythoncom
 
 from Antmicro.Renode import Emulator
 from Antmicro.Renode.Analyzers import LoggingUartAnalyzer
@@ -46,6 +49,16 @@ class Cleaner(metaclass=MetaSingleton):
             c()
 
 
+def start_main_thread():
+    """ start ExecuteAsMainThread """
+    if os.name == "nt":
+        pythoncom.CoInitializeEx(pythoncom.COINIT_APARTMENTTHREADED)
+        Emulator.ExecuteAsMainThread()
+        pythoncom.CoUninitialize()
+    else:
+        Emulator.ExecuteAsMainThread()
+    
+
 class EmulatorInit(metaclass=MetaSingleton):
     """A class used for initializing the emulator."""
 
@@ -54,7 +67,7 @@ class EmulatorInit(metaclass=MetaSingleton):
 
         Emulator.ShowAnalyzers = True
 
-        self.__thread = Thread(target=Emulator.ExecuteAsMainThread, daemon=True)
+        self.__thread = Thread(target=start_main_thread, daemon=True)
         self.__thread.start()
 
         Cleaner().add_multiple(
