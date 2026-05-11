@@ -97,7 +97,7 @@ def ensure_additional_libs(renode_bin_dir):
     if (renode_bin_dir / src_new).exists():
         ensure_symlink(src_new, renode_bin_dir / lib_new, relative=True, verbose=True)
         return [renode_bin_dir / "Mono.Posix.dll"]
-    else:
+    elif (renode_bin_dir / src_old).exists():
         netstd_dir = renode_bin_dir / bindll_dir / "lib/netstandard2.0"
         ensure_symlink(src_old, netstd_dir / lib_old, relative=True, verbose=True)
         return [netstd_dir / "Mono.Posix.NETStandard.dll"]
