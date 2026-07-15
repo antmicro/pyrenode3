@@ -23,10 +23,13 @@ jobs:
       - name: Prepare pyrenode
         run: |
           curl -q https://builds.renode.io/renode-latest.linux.tar.gz -o renode.tar.gz
+          python3 -m venv .venv
+          source .venv/bin/activate
           python3 -m pip install .
           python3 -m pip install -r examples/requirements.txt
 
       - name: Run examples
         run: |
+          source .venv/bin/activate
           export PYRENODE_PATH="$PWD/renode.tar.gz"
           for i in examples/*.py; do echo "Running test $i..."; timeout 240 python3 $i; done
