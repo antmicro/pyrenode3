@@ -3,7 +3,7 @@ on:
   push:
   workflow_dispatch:
 jobs:
-  test:
+  test-linux:
     runs-on: ubuntu-24.04
     steps:
       - name: Clone repository
@@ -36,3 +36,28 @@ jobs:
           source .venv/bin/activate
           export PYRENODE_PATH="$PWD/renode.tar.gz"
           for i in examples/*.py; do echo "Running test $i..."; timeout 240 python3 $i; done
+
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v6
+
+      - name: Prepare pyrenode
+        run: |
+          dotnet --version
+          python -m venv .venv
+          .venv\Scripts\Activate.ps1
+          python -m pip install .
+          python -m pip install -r examples/requirements.txt
+
+      - name: Download Renode
+        shell: bash
+        run: curl https://builds.renode.io/renode-latest.windows-portable.zip -o renode.zip
+
+      - name: Run examples
+        shell: bash
+        run: |
+          source .venv/Scripts/activate
+          export PYRENODE_PATH="$PWD/renode.zip"
+          for i in examples/*.py; do echo "Running test $i..."; timeout 300 python $i; done 
