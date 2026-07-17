@@ -1,3 +1,4 @@
+import atexit
 import glob
 import json
 import logging
@@ -147,7 +148,6 @@ class RenodeLoader(metaclass=MetaSingleton):
         self.__initialized = False
         self.__bin_dir = None
         self.__renode_dir = None
-        self.__temp_dir = None
         self.__additional_dlls = []
 
     @property
@@ -262,7 +262,7 @@ class RenodeLoader(metaclass=MetaSingleton):
         raise InitializationError(f"{path} doesn't exist.")
 
     @classmethod
-    def from_dir(cls, path: "Union[str, pathlib.Path]", temp=None):
+    def from_dir(cls, path: "Union[str, pathlib.Path]"):
         """Load Renode from a directory, detecting the runtime from its layout."""
         renode_dir = cls.discover_renode_dir(path)
 
@@ -271,23 +271,23 @@ class RenodeLoader(metaclass=MetaSingleton):
         ):
             renode_bin_dir = cls.discover_bin_dir(renode_dir)
             if cls.is_coreclr_bin_dir(renode_bin_dir):
-                return cls.from_net_dir(renode_dir, renode_bin_dir, temp=temp)
+                return cls.from_net_dir(renode_dir, renode_bin_dir)
             raise InitializationError(f"Can't determine Renode runtime layout in {renode_bin_dir}.")
 
         if cls.is_coreclr_bin_dir(renode_dir / "bin"):
-            return cls.from_net_dir(renode_dir, renode_dir / "bin", temp=temp)
+            return cls.from_net_dir(renode_dir, renode_dir / "bin")
 
         if cls.is_coreclr_bin_dir(renode_dir):
             root = renode_dir.parent if renode_dir.name == "bin" else renode_dir
-            return cls.from_net_dir(root, renode_dir, temp=temp)
+            return cls.from_net_dir(root, renode_dir)
 
         if portable_bin := cls.get_single_file_portable_bin(renode_dir):
-            return cls.from_net_bin(portable_bin, temp=temp)
+            return cls.from_net_bin(portable_bin)
 
         raise InitializationError(f"Can't determine Renode runtime layout in {renode_dir}.")
 
     @classmethod
-    def from_net_dir(cls, renode_dir, renode_bin_dir, temp=None):
+    def from_net_dir(cls, renode_dir, renode_bin_dir):
         additional_libs = ensure_additional_libs(renode_bin_dir)
 
         if cls.is_self_contained_coreclr_bin_dir(renode_bin_dir):
@@ -303,7 +303,6 @@ class RenodeLoader(metaclass=MetaSingleton):
         loader.__setup(
             renode_bin_dir,
             renode_dir,
-            temp=temp,
             add_dlls=additional_libs,
         )
         return loader
@@ -337,18 +336,29 @@ class RenodeLoader(metaclass=MetaSingleton):
     def from_pkg(cls, path: "Union[str, pathlib.Path]"):
         """Load Renode from a package."""
         path = pathlib.Path(path)
-        temp = tempfile.TemporaryDirectory()
+        temp = tempfile.mkdtemp()
+
+        # On Windows due to .dll file locking the automatic cleanup might fail.
+        # In that case the user should be notified that manual removal is necessary.
+        def rm_temp():
+            try:
+                shutil.rmtree(pathlib.Path(temp))
+            except:
+                print(f"Automatic cleanup failed to remove temporary directory '{temp}'.", file=sys.stderr)
+
+        atexit.register(rm_temp)
+
         if zipfile.is_zipfile(path):
             with zipfile.ZipFile(path, "r") as f:
-                f.extractall(temp.name)
+                f.extractall(temp)
         else:
             with tarfile.open(path, "r") as f:
-                f.extractall(temp.name)
+                f.extractall(temp)
 
-        return cls.from_dir(temp.name, temp=temp)
+        return cls.from_dir(temp)
 
     @classmethod
-    def from_net_bin(cls, path: "Union[str, pathlib.Path]", temp=None):
+    def from_net_bin(cls, path: "Union[str, pathlib.Path]"):
         """Load Renode from binary."""
         renode_bin = pathlib.Path(path).resolve()
         renode_dir = renode_bin.parent
@@ -456,7 +466,7 @@ class RenodeLoader(metaclass=MetaSingleton):
         loader.__renode_dir = renode_dir
         with loader.in_root():
             pythonnet_load("coreclr", dotnet_root=binaries, runtime_spec=DotnetCoreRuntimeSpec("Microsoft.NETCore.App", tfm_full, runtime))
-        loader.__setup(binaries, renode_dir, temp=temp)
+        loader.__setup(binaries, renode_dir)
 
         return loader
 
@@ -518,7 +528,6 @@ class RenodeLoader(metaclass=MetaSingleton):
         self,
         bin_dir: "Union[str, pathlib.Path]",
         renode_dir: "Union[str, pathlib.Path]",
-        temp=None,
         add_dlls=None,
     ):
         if self.__initialized:
@@ -528,7 +537,6 @@ class RenodeLoader(metaclass=MetaSingleton):
         self.__bin_dir = pathlib.Path(bin_dir).absolute()
         self.__renode_dir = pathlib.Path(renode_dir).absolute()
         # Keep extracted package directories alive for as long as the loader exists.
-        self.__temp_dir = temp
         self.__additional_dlls = add_dlls or []
 
         self.__load_asm()
