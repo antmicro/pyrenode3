@@ -35,7 +35,7 @@ jobs:
         run: |
           source .venv/bin/activate
           export PYRENODE_PATH="$PWD/renode.tar.gz"
-          for i in examples/*.py; do echo "Running test $i..."; timeout 240 python3 $i; done
+          ./examples/run_examples.sh
 
   test-windows:
     runs-on: windows-latest
@@ -60,4 +60,4 @@ jobs:
         run: |
           source .venv/Scripts/activate
           export PYRENODE_PATH="$PWD/renode.zip"
-          for i in examples/*.py; do echo "Running test $i..."; timeout 300 python $i; done 
+          ./examples/run_examples.sh 
