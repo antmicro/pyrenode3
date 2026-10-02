@@ -6,6 +6,7 @@ import threading
 from pyrenode3.loader import RenodeLoader
 from pyrenode3 import env
 
+logger = logging.getLogger(__name__)
 
 def get_renode_path_from_env():
     paths = []
@@ -16,7 +17,7 @@ def get_renode_path_from_env():
     for var in env.PYRENODE_PATH_ALIASES:
         value = os.environ.get(var)
         if value:
-            logging.warning(f"{var} is deprecated. Please use {env.PYRENODE_PATH} instead.")
+            logger.warning(f"{var} is deprecated. Please use {env.PYRENODE_PATH} instead.")
             paths.append((var, value))
 
     if not paths:

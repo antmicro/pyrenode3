@@ -21,6 +21,7 @@ from clr_loader.util.runtime_spec import DotnetCoreRuntimeSpec
 from pyrenode3 import env
 from pyrenode3.singleton import MetaSingleton
 
+logger = logging.getLogger(__name__)
 
 class InitializationError(Exception):
     ...
@@ -73,8 +74,8 @@ def ensure_symlink(src, dst, relative=False, verbose=False):
             shutil.copy(src, dst)
             linktype = "copy"
     if verbose:
-        logging.warning(f"{dst.name} is not in the expected location. Created {linktype}.")
-        logging.warning(f"{src} -> {dst}")
+        logger.warning(f"{dst.name} is not in the expected location. Created {linktype}.")
+        logger.warning(f"{src} -> {dst}")
 
 # Returns the runtime identifier (RID) of the current platform,
 # only handle targets Renode supports
@@ -313,14 +314,14 @@ class RenodeLoader(metaclass=MetaSingleton):
             renode_build_dir = renode_dir / env.pyrenode_build_output
 
             if not renode_build_dir.exists():
-                logging.critical(f"{renode_build_dir} doesn't exist.")
+                logger.critical(f"{renode_build_dir} doesn't exist.")
                 sys.exit(1)
         else:
             default = "output/bin/Release"
             dirs = glob.glob(str(renode_dir / default))
 
             if len(dirs) != 1:
-                logging.critical(
+                logger.critical(
                     f"Can't determine Renode directory using the '{renode_dir / default}' pattern. "
                     f"Please specify its path (relative to {renode_dir}) in the "
                     f"{env.PYRENODE_BUILD_OUTPUT} variable."
@@ -329,7 +330,7 @@ class RenodeLoader(metaclass=MetaSingleton):
 
             renode_build_dir = pathlib.Path(dirs[0])
 
-        logging.info(f"Using {renode_build_dir} as a directory with Renode binaries.")
+        logger.info(f"Using {renode_build_dir} as a directory with Renode binaries.")
         return renode_build_dir
 
     @classmethod
@@ -442,8 +443,8 @@ class RenodeLoader(metaclass=MetaSingleton):
         else:
             tfm_full = "8.0.0"
             system_dlls = [dll.name for dll in binaries.glob("*.dll")]
-            logging.warning(f"Could not find {SYSTEM_RUNTIME} in deps.json. "
-                            f"Assuming framework version {tfm_full}.")
+            logger.warning(f"Could not find {SYSTEM_RUNTIME} in deps.json. "
+                           f"Assuming framework version {tfm_full}.")
 
         with open(deps_file, "w") as deps_fp:
             json.dump(deps, deps_fp)
