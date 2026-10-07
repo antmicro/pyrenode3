@@ -67,8 +67,8 @@ test-dotnet-single-file-portable:
   script:
     - *init_python
     # Download Renode pkg
-    - wget --progress=dot:giga https://builds.renode.io/renode-1.16.1+20260520gita52e7097e.linux-portable-dotnet.tar.gz
-    - export PYRENODE_PATH=$PWD/renode-1.16.1+20260520gita52e7097e.linux-portable-dotnet.tar.gz
+    - wget --progress=dot:giga https://builds.renode.io/renode-1.17.0+20261007git68a202620.linux-portable.tar.gz
+    - export PYRENODE_PATH=$PWD/renode-1.17.0+20261007git68a202620.linux-portable.tar.gz
     - ./examples/run_examples.sh 
 
 test-dotnet-portable:
